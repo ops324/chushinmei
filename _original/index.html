@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中心銘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">中心銘</h1>
+      <p class="site-subtitle">好きな言葉を記す</p>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- 今日の言葉 -->
+    <section class="today-section" id="todaySection">
+      <div class="today-label">— 今日の言葉 —</div>
+      <div class="today-card" id="todayCard">
+        <p class="today-text" id="todayText"></p>
+        <p class="today-author" id="todayAuthor"></p>
+      </div>
+      <button class="btn-random" id="btnRandom" title="別の言葉を表示">くじを引く</button>
+    </section>
+
+    <!-- 追加フォーム -->
+    <section class="form-section">
+      <button class="btn-toggle-form" id="btnToggleForm">＋ 言葉を記す</button>
+      <div class="form-wrapper" id="formWrapper">
+        <form id="wordForm" class="word-form">
+          <div class="form-group">
+            <label for="inputText">言葉 <span class="required">*</span></label>
+            <textarea id="inputText" rows="3" placeholder="言葉を入力..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="inputAuthor">出典・作者</label>
+            <input type="text" id="inputAuthor" placeholder="例：老子、夏目漱石、映画名など">
+          </div>
+          <div class="form-group">
+            <label for="inputMemo">メモ</label>
+            <input type="text" id="inputMemo" placeholder="感想や出会った場所など">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">記す</button>
+            <button type="button" class="btn-cancel" id="btnCancel">閉じる</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 検索 -->
+    <section class="search-section">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" class="search-input" placeholder="言葉・出典で検索...">
+        <span class="search-count" id="searchCount"></span>
+      </div>
+    </section>
+
+    <!-- 一覧 -->
+    <section class="list-section">
+      <div class="word-list" id="wordList">
+        <!-- カードがここに挿入される -->
+      </div>
+      <div class="empty-state" id="emptyState">
+        <p>まだ言葉が記されていません。</p>
+        <p>好きな言葉を記してみましょう。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>中心銘</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
