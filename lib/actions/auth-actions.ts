@@ -4,18 +4,31 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
-function toUserMessage(error: { message: string }): string {
-  const msg = error.message
-  if (
-    msg.includes('Unexpected token') ||
-    msg.includes('DOCTYPE') ||
-    msg.includes('Failed to fetch') ||
-    msg.includes('fetch failed') ||
-    msg.includes('NetworkError')
-  ) {
-    return 'Supabaseサーバーに接続できません。しばらく待ってから再度お試しください。（管理者: Supabaseプロジェクトの停止または環境変数をご確認ください）'
-  }
-  return msg
+const CONNECTION_ERROR_MSG =
+  'サーバーに接続できません。しばらく待ってから再度お試しください。（管理者: Supabaseプロジェクトの停止または環境変数をご確認ください）'
+
+// ユーザーに直接表示してよい既知の認証エラーメッセージ（部分一致）
+const KNOWN_USER_MESSAGES = [
+  'Invalid login credentials',
+  'Email not confirmed',
+  'User already registered',
+  'Password should be at least',
+  'Invalid email',
+  'Signup requires a valid password',
+  'Email link is invalid or has expired',
+  'Token has expired or is invalid',
+  'For security purposes',
+  'Email rate limit exceeded',
+]
+
+function toUserMessage(error: { message?: string; status?: number }): string {
+  const msg = error.message ?? ''
+  // ステータスコード 5xx は接続・サーバーエラー
+  if (error.status && error.status >= 500) return CONNECTION_ERROR_MSG
+  // 既知のユーザー向けメッセージのみ直接表示
+  if (KNOWN_USER_MESSAGES.some((known) => msg.includes(known))) return msg
+  // それ以外（{}、DOCTYPE、Unexpected token 等）はすべて接続エラーとして扱う
+  return CONNECTION_ERROR_MSG
 }
 
 export async function login(

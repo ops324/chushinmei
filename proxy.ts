@@ -4,6 +4,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  const { pathname } = request.nextUrl
+
+  // パブリックパス（認証不要）— Supabaseへの接続を省略
+  if (pathname.startsWith('/auth') || pathname.startsWith('/shared')) {
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -24,12 +31,6 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
-
-  // パブリックパス（認証不要）
-  if (pathname.startsWith('/auth') || pathname.startsWith('/shared')) {
-    return supabaseResponse
-  }
 
   // 未認証はログインへリダイレクト
   if (!user) {
