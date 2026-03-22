@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useOptimistic, useTransition, useEffect } from 'react'
-import { addWord, deleteWord } from '@/lib/actions/word-actions'
+import { addWord, deleteWord, updateWord } from '@/lib/actions/word-actions'
 import { useToast } from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import WordMenu from './WordMenu'
@@ -238,9 +238,80 @@ function WordCard({
   onDelete: () => void
   showToast: (msg: string, type?: 'success' | 'error') => void
 }) {
+  const [editing, setEditing] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const date = new Date(word.created_at).toLocaleDateString('ja-JP', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
+
+  function handleUpdate(formData: FormData) {
+    startTransition(async () => {
+      try {
+        await updateWord(word.id, formData)
+        setEditing(false)
+        showToast('言葉を更新しました')
+      } catch {
+        showToast('更新に失敗しました', 'error')
+      }
+    })
+  }
+
+  if (editing) {
+    return (
+      <div className="relative bg-bg-card border border-ai-light rounded-sm px-6 py-5">
+        <form action={handleUpdate} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-light tracking-wide">
+              言葉 <span className="text-[#8b3a3a]">*</span>
+            </label>
+            <textarea
+              name="text"
+              rows={3}
+              required
+              defaultValue={word.text}
+              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-light tracking-wide">出典・作者</label>
+            <input
+              name="author"
+              type="text"
+              defaultValue={word.author}
+              placeholder="例：老子、夏目漱石、映画名など"
+              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-ink-light tracking-wide">メモ</label>
+            <input
+              name="memo"
+              type="text"
+              defaultValue={word.memo}
+              placeholder="感想や出会った場所など"
+              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+            />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="px-5 py-2 text-sm text-ink-light border border-border rounded-sm hover:border-ink-light transition-colors"
+            >
+              キャンセル
+            </button>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="px-7 py-2 text-sm bg-ai text-white rounded-sm hover:bg-ai-light transition-colors disabled:opacity-50"
+            >
+              更新
+            </button>
+          </div>
+        </form>
+      </div>
+    )
+  }
 
   return (
     <div className="relative bg-bg-card border border-border rounded-sm px-6 py-5 hover:shadow-[0_2px_12px_var(--shadow)] transition-shadow">
@@ -249,6 +320,7 @@ function WordCard({
           wordId={word.id}
           isPublic={word.is_public}
           shareId={word.share_id}
+          onEdit={() => setEditing(true)}
           onDelete={onDelete}
           showToast={showToast}
         />

@@ -22,6 +22,23 @@ export async function addWord(formData: FormData) {
   revalidatePath('/')
 }
 
+export async function updateWord(id: string, formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  const text = (formData.get('text') as string).trim()
+  if (!text) throw new Error('言葉は必須です')
+
+  await supabase.from('words').update({
+    text,
+    author: (formData.get('author') as string | null)?.trim() ?? '',
+    memo: (formData.get('memo') as string | null)?.trim() ?? '',
+  }).eq('id', id).eq('user_id', user.id)
+
+  revalidatePath('/')
+}
+
 export async function deleteWord(id: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
