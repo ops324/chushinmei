@@ -4,7 +4,7 @@ import { useState, useOptimistic, useTransition, useEffect } from 'react'
 import { addWord, deleteWord } from '@/lib/actions/word-actions'
 import { useToast } from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import ShareToggle from './ShareToggle'
+import WordMenu from './WordMenu'
 
 type Word = {
   id: string
@@ -243,8 +243,17 @@ function WordCard({
   })
 
   return (
-    <div className="group relative bg-bg-card border border-border rounded-sm px-6 py-5 hover:shadow-[0_2px_12px_var(--shadow)] transition-shadow">
-      <p className="text-base font-medium leading-[1.9] whitespace-pre-wrap text-ink mb-2">
+    <div className="relative bg-bg-card border border-border rounded-sm px-6 py-5 hover:shadow-[0_2px_12px_var(--shadow)] transition-shadow">
+      <div className="absolute top-3 right-3">
+        <WordMenu
+          wordId={word.id}
+          isPublic={word.is_public}
+          shareId={word.share_id}
+          onDelete={onDelete}
+          showToast={showToast}
+        />
+      </div>
+      <p className="text-base font-medium leading-[1.9] whitespace-pre-wrap text-ink mb-2 pr-8">
         {word.text}
       </p>
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-light">
@@ -252,19 +261,6 @@ function WordCard({
         {word.memo && <span className="text-ink-faint italic">{word.memo}</span>}
         <span className="ml-auto text-ink-faint">{date}</span>
       </div>
-      <ShareToggle
-        wordId={word.id}
-        isPublic={word.is_public}
-        shareId={word.share_id}
-        showToast={showToast}
-      />
-      <button
-        onClick={onDelete}
-        className="absolute top-3 right-3 px-2 py-0.5 text-ink-faint opacity-0 group-hover:opacity-100 hover:text-[#8b3a3a] hover:bg-[#f5e8e8] rounded-sm transition-all text-sm leading-none"
-        title="削除"
-      >
-        ×
-      </button>
     </div>
   )
 }
