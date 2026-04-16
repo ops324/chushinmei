@@ -19,6 +19,9 @@ const ERROR_MESSAGE_MAP: Record<string, string> = {
   'Token has expired or is invalid': '認証トークンが無効または期限切れです。再度お試しください',
   'For security purposes': 'セキュリティ保護のため、しばらく待ってから再度お試しください',
   'Email rate limit exceeded': 'メール送信の上限に達しました。しばらく待ってから再度お試しください',
+  'Auth session missing': 'セッションが無効です。パスワードリセットのメールを再度送信してください',
+  'not authenticated': '認証されていません。再度ログインしてください',
+  'JWT expired': 'セッションが期限切れです。再度ログインしてください',
 }
 
 function toUserMessage(error: { message?: string; status?: number }): string {
@@ -144,6 +147,12 @@ export async function updatePassword(
     supabase = await createClient()
   } catch (e) {
     return { error: toUserMessage({ message: String(e) }) }
+  }
+
+  // セッションが存在するか確認
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'セッションが無効です。パスワードリセットのメールを再度送信してください。' }
   }
 
   try {

@@ -9,7 +9,13 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      // コード交換に失敗した場合、ログイン画面にエラーを表示
+      return NextResponse.redirect(
+        `${origin}/auth/login#error_code=otp_expired&error_description=${encodeURIComponent(error.message)}`
+      )
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`)

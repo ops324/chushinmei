@@ -6,8 +6,10 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // パブリックパス（認証不要）— Supabaseへの接続を省略
-  if (pathname.startsWith('/auth') || pathname.startsWith('/shared')) {
+  // パブリックパス（認証不要かつセッション不要）— Supabaseへの接続を省略
+  // /auth/callback と /auth/update-password はセッション処理が必要なので除外
+  const authNeedsSession = pathname === '/auth/callback' || pathname === '/auth/update-password'
+  if ((pathname.startsWith('/auth') && !authNeedsSession) || pathname.startsWith('/shared')) {
     return supabaseResponse
   }
 
@@ -31,6 +33,11 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+
+  // authパスでセッション処理が必要なルートはリフレッシュのみ（リダイレクトしない）
+  if (authNeedsSession) {
+    return supabaseResponse
+  }
 
   // 未認証はログインへリダイレクト
   if (!user) {
