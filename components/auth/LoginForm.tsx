@@ -1,18 +1,38 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { login, loginWithGoogle } from '@/lib/actions/auth-actions'
 import Link from 'next/link'
 
+const HASH_ERROR_MAP: Record<string, string> = {
+  otp_expired: 'メールリンクが無効または期限切れです。再度リセットをお試しください',
+  access_denied: 'アクセスが拒否されました',
+}
+
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, null)
+  const [hashError, setHashError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const hash = window.location.hash.substring(1)
+    if (!hash) return
+    const params = new URLSearchParams(hash)
+    const errorCode = params.get('error_code')
+    if (errorCode) {
+      setHashError(HASH_ERROR_MAP[errorCode] ?? params.get('error_description')?.replace(/\+/g, ' ') ?? 'エラーが発生しました')
+      // ハッシュをクリア
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  }, [])
+
+  const displayError = state?.error ?? hashError
 
   return (
     <div className="bg-bg-card border border-border rounded-lg p-6 shadow-sm">
       <form action={action} className="flex flex-col gap-4">
-        {state?.error && (
+        {displayError && (
           <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2">
-            {state.error}
+            {displayError}
           </p>
         )}
         <div className="flex flex-col gap-1">
