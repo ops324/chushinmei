@@ -25,9 +25,10 @@ function toUserMessage(error: { message?: string; status?: number }): string {
   const msg = error.message ?? ''
   // ステータスコード 5xx は接続・サーバーエラー
   if (error.status && error.status >= 500) return CONNECTION_ERROR_MSG
-  // 既知のエラーメッセージを日本語に変換
+  // 既知のエラーメッセージを日本語に変換（大文字小文字を無視）
+  const msgLower = msg.toLowerCase()
   for (const [key, jaMsg] of Object.entries(ERROR_MESSAGE_MAP)) {
-    if (msg.includes(key)) return jaMsg
+    if (msgLower.includes(key.toLowerCase())) return jaMsg
   }
   // それ以外（{}、DOCTYPE、Unexpected token 等）はすべて接続エラーとして扱う
   return CONNECTION_ERROR_MSG
