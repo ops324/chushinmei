@@ -1,5 +1,4 @@
 import LoginForm from '@/components/auth/LoginForm'
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
 export default async function LoginPage({
@@ -9,13 +8,10 @@ export default async function LoginPage({
 }) {
   const { code } = await searchParams
 
+  // codeパラメータがある場合はcallback Route Handlerに転送
+  // （Server ComponentではCookieを書き込めないため）
   if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      redirect('/auth/update-password')
-    }
-    // コード交換に失敗した場合はログインフォームを表示（エラーはハッシュ経由で表示）
+    redirect(`/auth/callback?code=${code}&next=/auth/update-password`)
   }
 
   return (
