@@ -1,19 +1,6 @@
 import LoginForm from '@/components/auth/LoginForm'
-import { redirect } from 'next/navigation'
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ code?: string }>
-}) {
-  const { code } = await searchParams
-
-  // codeパラメータがある場合はcallback Route Handlerに転送
-  // （Server ComponentではCookieを書き込めないため）
-  if (code) {
-    redirect(`/auth/callback?code=${code}&next=/auth/update-password`)
-  }
-
+export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-4">
       <div className="w-full max-w-sm">
