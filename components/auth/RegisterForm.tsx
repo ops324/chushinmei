@@ -68,7 +68,7 @@ export default function RegisterForm() {
       <div className="mt-5 pt-5 border-t border-border text-center">
         <p className="text-sm text-ink-faint">
           すでにアカウントをお持ちの方は{' '}
-          <Link href="/auth/login" className="text-ai hover:underline underline-offset-4">
+          <Link href="/auth/login" className="text-ai font-medium hover:underline underline-offset-4">
             ログイン
           </Link>
         </p>

@@ -75,13 +75,13 @@ export default function LoginForm() {
 
       <div className="mt-5 pt-5 border-t border-border flex flex-col gap-2 text-center">
         <p className="text-sm text-ink-faint">
-          <Link href="/auth/forgot-password" className="text-ai hover:underline underline-offset-4">
+          <Link href="/auth/forgot-password" className="text-ai font-medium hover:underline underline-offset-4">
             パスワードを忘れた方
           </Link>
         </p>
         <p className="text-sm text-ink-faint">
           アカウントがない方は{' '}
-          <Link href="/auth/register" className="text-ai hover:underline underline-offset-4">
+          <Link href="/auth/register" className="text-ai font-medium hover:underline underline-offset-4">
             登録
           </Link>
         </p>
