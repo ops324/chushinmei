@@ -89,24 +89,25 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
                 required
                 placeholder="言葉を入力..."
                 className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+                onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation() }}
               />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs text-ink-light tracking-wide">出典・作者</label>
-              <input
+              <textarea
                 name="author"
-                type="text"
+                rows={2}
                 placeholder="例：老子、夏目漱石、映画名など"
-                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
               />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs text-ink-light tracking-wide">メモ</label>
-              <input
+              <textarea
                 name="memo"
-                type="text"
+                rows={2}
                 placeholder="感想や出会った場所など"
-                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
               />
             </div>
             <div className="flex justify-end gap-3">
@@ -270,26 +271,27 @@ function WordCard({
               required
               defaultValue={word.text}
               className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+              onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation() }}
             />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs text-ink-light tracking-wide">出典・作者</label>
-            <input
+            <textarea
               name="author"
-              type="text"
+              rows={2}
               defaultValue={word.author}
               placeholder="例：老子、夏目漱石、映画名など"
-              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
             />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs text-ink-light tracking-wide">メモ</label>
-            <input
+            <textarea
               name="memo"
-              type="text"
+              rows={2}
               defaultValue={word.memo}
               placeholder="感想や出会った場所など"
-              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
             />
           </div>
           <div className="flex justify-end gap-3">
@@ -328,10 +330,10 @@ function WordCard({
       <p className="text-base font-medium leading-[1.9] whitespace-pre-wrap text-ink mb-2 pr-8">
         {word.text}
       </p>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-light">
-        {word.author && <span>— {word.author}</span>}
-        {word.memo && <span className="text-ink-faint italic">{word.memo}</span>}
-        <span className="ml-auto text-ink-faint">{date}</span>
+      <div className="flex flex-col gap-y-1 text-xs text-ink-light">
+        {word.author && <span className="whitespace-pre-wrap">— {word.author}</span>}
+        {word.memo && <span className="whitespace-pre-wrap text-ink-faint italic">{word.memo}</span>}
+        <span className="text-ink-faint">{date}</span>
       </div>
     </div>
   )
