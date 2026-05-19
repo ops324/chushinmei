@@ -45,28 +45,35 @@ export default async function SharedWordPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
-      <header className="border-b border-border">
-        <div className="max-w-2xl mx-auto w-full px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-sm tracking-[0.2em] text-ink-light hover:text-ink transition-colors">
+      <header
+        className="bg-bg-card border-b border-border"
+        style={{ borderTop: '3px solid var(--ai)' }}
+      >
+        <div className="max-w-2xl mx-auto w-full px-4 h-[52px] flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-xs tracking-[0.2em] text-ink-faint hover:text-ink transition-colors font-medium"
+          >
             中心銘
           </Link>
         </div>
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-16">
-        <div className="relative text-center max-w-lg w-full p-10 bg-bg-card border border-border rounded-sm">
+        <div className="relative text-center max-w-lg w-full p-10 bg-bg-card border border-border rounded overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-ai" />
           <div
-            className="absolute inset-[6px] border border-border rounded-sm pointer-events-none"
+            className="absolute inset-[7px] border border-border rounded pointer-events-none opacity-50"
             aria-hidden
           />
-          <p className="text-xs tracking-[0.3em] text-ink-faint mb-6">— 中心銘 —</p>
-          <p className="text-xl font-medium leading-[2] text-ink mb-4 whitespace-pre-wrap">
+          <p className="text-[10px] tracking-[0.4em] text-ink-faint mb-7 uppercase">中心銘</p>
+          <p className="text-xl font-medium leading-[2.1] text-ink mb-5 whitespace-pre-wrap">
             {word.text}
           </p>
           {word.author && (
-            <p className="text-sm text-ink-light tracking-wide">— {word.author}</p>
+            <p className="text-sm text-ink-light tracking-wide whitespace-pre-wrap">— {word.author}</p>
           )}
-          <p className="text-xs text-ink-faint mt-6">{date}</p>
+          <p className="text-xs text-ink-faint mt-7">{date}</p>
         </div>
       </main>
     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 type ToastType = 'success' | 'error'
 
@@ -34,18 +34,21 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
         {toasts.map(t => (
-          <ToastItem key={t.id} toast={t} onDismiss={() => setToasts(prev => prev.filter(x => x.id !== t.id))} />
+          <ToastBadge
+            key={t.id}
+            toast={t}
+            onDismiss={() => setToasts(prev => prev.filter(x => x.id !== t.id))}
+          />
         ))}
       </div>
     </ToastContext.Provider>
   )
 }
 
-function ToastItem({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => void }) {
+function ToastBadge({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => void }) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    // フェードイン
     const t = setTimeout(() => setVisible(true), 10)
     return () => clearTimeout(t)
   }, [])
@@ -55,15 +58,16 @@ function ToastItem({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => vo
   return (
     <div
       onClick={onDismiss}
-      style={{ transition: 'opacity 0.2s, transform 0.2s' }}
-      className={`pointer-events-auto cursor-pointer max-w-xs px-4 py-3 rounded-sm border text-sm leading-[1.6] shadow-md
-        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
-        ${isError
-          ? 'bg-[#fdf2f2] border-[#e8c4c4] text-[#7a3030]'
-          : 'bg-bg-card border-border text-ink'
-        }`}
+      style={{
+        transition: 'opacity 0.2s, transform 0.25s',
+        background: isError ? 'var(--danger-bg)' : 'var(--bg-card)',
+        borderColor: isError ? 'var(--danger-border)' : 'var(--border)',
+        color: isError ? 'var(--danger)' : 'var(--ink)',
+      }}
+      className={`pointer-events-auto cursor-pointer max-w-xs px-4 py-3 rounded border text-sm leading-[1.6] shadow-[0_4px_16px_var(--shadow-md)]
+        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
     >
-      <span className="mr-1.5">{isError ? '✕' : '✓'}</span>
+      <span className="mr-2 opacity-70">{isError ? '✕' : '✓'}</span>
       {toast.message}
     </div>
   )

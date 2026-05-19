@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useSearchParams, useRouter } from 'next/navigation'
 
+const inputClass =
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors disabled:opacity-50 placeholder:text-ink-faint'
+
+const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
+
 export default function UpdatePasswordForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -28,7 +33,6 @@ export default function UpdatePasswordForm() {
         setVerifying(false)
       })
     } else {
-      // token_hashがない場合、既存セッションを確認
       const supabase = createClient()
       supabase.auth.getUser().then(({ data: { user } }) => {
         if (user) {
@@ -71,29 +75,33 @@ export default function UpdatePasswordForm() {
 
   if (verifying) {
     return (
-      <div className="bg-bg-card border border-border rounded-lg p-6 shadow-sm">
-        <p className="text-sm text-ink-light text-center">認証を確認中...</p>
+      <div className="bg-bg-card border border-border rounded-lg p-7">
+        <p className="text-sm text-ink-faint text-center">認証を確認中...</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-bg-card border border-border rounded-lg p-6 shadow-sm">
+    <div className="bg-bg-card border border-border rounded-lg p-7">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {error && (
-          <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2">
+          <p
+            className="text-sm rounded px-3.5 py-2.5 border leading-[1.7]"
+            style={{ background: 'var(--danger-bg)', borderColor: 'var(--danger-border)', color: 'var(--danger)' }}
+          >
             {error}
           </p>
         )}
         {success && (
-          <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded px-3 py-2">
+          <p
+            className="text-sm rounded px-3.5 py-2.5 border leading-[1.7]"
+            style={{ background: 'var(--success-bg)', borderColor: 'var(--success-border)', color: 'var(--success)' }}
+          >
             {success}
           </p>
         )}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-ink-light" htmlFor="password">
-            新しいパスワード
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass} htmlFor="password">新しいパスワード</label>
           <input
             id="password"
             name="password"
@@ -102,13 +110,11 @@ export default function UpdatePasswordForm() {
             minLength={6}
             disabled={!sessionReady}
             autoComplete="new-password"
-            className="border border-border rounded px-3 py-2 text-ink bg-white focus:outline-none focus:border-ai text-sm disabled:opacity-50"
+            className={inputClass}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-ink-light" htmlFor="password_confirm">
-            パスワードを確認
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass} htmlFor="password_confirm">パスワードを確認</label>
           <input
             id="password_confirm"
             name="password_confirm"
@@ -117,13 +123,13 @@ export default function UpdatePasswordForm() {
             minLength={6}
             disabled={!sessionReady}
             autoComplete="new-password"
-            className="border border-border rounded px-3 py-2 text-ink bg-white focus:outline-none focus:border-ai text-sm disabled:opacity-50"
+            className={inputClass}
           />
         </div>
         <button
           type="submit"
           disabled={pending || !sessionReady}
-          className="bg-ai text-white rounded py-2 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-50"
+          className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
         >
           {pending ? '更新中...' : 'パスワードを更新'}
         </button>

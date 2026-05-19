@@ -16,6 +16,17 @@ type Word = {
   created_at: string
 }
 
+const inputClass =
+  'text-sm px-3 py-2.5 bg-bg border border-border rounded text-ink outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted resize-y placeholder:text-ink-faint transition-colors'
+
+const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
+
+const btnPrimary =
+  'px-7 py-2 text-sm font-medium bg-ai text-white rounded hover:bg-ai-light transition-colors disabled:opacity-40'
+
+const btnSecondary =
+  'px-5 py-2 text-sm text-ink-light border border-border rounded hover:border-border-strong hover:text-ink transition-colors'
+
 export default function WordsClient({ initialWords }: { initialWords: Word[] }) {
   const { showToast } = useToast()
   const [formOpen, setFormOpen] = useState(false)
@@ -70,59 +81,56 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
       <section className="mb-8">
         <button
           onClick={() => setFormOpen(o => !o)}
-          className="w-full py-3 px-4 text-sm tracking-widest text-ink-light border border-dashed border-border rounded-sm hover:bg-bg-card hover:border-ai hover:text-ai transition-all text-center"
+          className={`w-full py-3 px-4 text-sm tracking-widest border border-dashed rounded transition-all text-center ${
+            formOpen
+              ? 'text-ink-light border-border-strong bg-bg-card'
+              : 'text-ink-light border-border hover:bg-bg-card hover:border-ai hover:text-ai'
+          }`}
         >
           {formOpen ? '✕ 閉じる' : '＋ 言葉を記す'}
         </button>
+
         {formOpen && (
           <form
             action={handleAdd}
-            className="bg-bg-card border border-border border-t-0 rounded-b-sm p-6 flex flex-col gap-4"
+            className="bg-bg-card border border-border border-t-0 rounded-b p-6 flex flex-col gap-4"
           >
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-ink-light tracking-wide">
-                言葉 <span className="text-[#8b3a3a]">*</span>
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>
+                言葉 <span className="text-danger">*</span>
               </label>
               <textarea
                 name="text"
                 rows={3}
                 required
                 placeholder="言葉を入力..."
-                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+                className={inputClass}
                 onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation() }}
               />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-ink-light tracking-wide">出典・作者</label>
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>出典・作者</label>
               <textarea
                 name="author"
                 rows={2}
                 placeholder="例：老子、夏目漱石、映画名など"
-                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+                className={inputClass}
               />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-ink-light tracking-wide">メモ</label>
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>メモ</label>
               <textarea
                 name="memo"
                 rows={2}
                 placeholder="感想や出会った場所など"
-                className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+                className={inputClass}
               />
             </div>
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setFormOpen(false)}
-                className="px-5 py-2 text-sm text-ink-light border border-border rounded-sm hover:border-ink-light transition-colors"
-              >
+            <div className="flex justify-end gap-3 pt-1">
+              <button type="button" onClick={() => setFormOpen(false)} className={btnSecondary}>
                 閉じる
               </button>
-              <button
-                type="submit"
-                disabled={isPending}
-                className="px-7 py-2 text-sm bg-ai text-white rounded-sm hover:bg-ai-light transition-colors disabled:opacity-50"
-              >
+              <button type="submit" disabled={isPending} className={btnPrimary}>
                 記す
               </button>
             </div>
@@ -133,15 +141,20 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
       {/* 検索 */}
       <section className="mb-6">
         <div className="relative flex items-center">
+          <span className="absolute left-3.5 text-ink-faint pointer-events-none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+          </span>
           <input
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="言葉・出典で検索..."
-            className="w-full text-sm px-4 py-3 bg-bg-card border border-border rounded-sm text-ink outline-none focus:border-ai-light placeholder:text-ink-faint"
+            className="w-full text-sm pl-9 pr-14 py-2.5 bg-bg-card border border-border rounded text-ink outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted placeholder:text-ink-faint transition-colors"
           />
-          <span className="absolute right-4 text-xs text-ink-faint pointer-events-none">
-            {query ? `${filtered.length} 件` : `${optimisticWords.length} 件`}
+          <span className="absolute right-3.5 text-xs text-ink-faint pointer-events-none">
+            {query ? `${filtered.length}件` : `${optimisticWords.length}件`}
           </span>
         </div>
       </section>
@@ -149,18 +162,18 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
       {/* 言葉一覧 */}
       <section>
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-ink-faint text-sm leading-[2.2]">
+          <div className="text-center py-14">
             {query ? (
-              <p>「{query}」に一致する言葉がありません。</p>
+              <p className="text-sm text-ink-faint">「{query}」に一致する言葉がありません。</p>
             ) : (
-              <>
-                <p>まだ言葉が記されていません。</p>
-                <p>好きな言葉を記してみましょう。</p>
-              </>
+              <div>
+                <p className="text-[11px] tracking-[0.3em] text-ink-faint mb-2">— ここは静かです —</p>
+                <p className="text-sm text-ink-faint">大切な言葉を記してみてください。</p>
+              </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {filtered.map(word => (
               <WordCard
                 key={word.id}
@@ -210,22 +223,34 @@ function TodayWord({ words }: { words: Word[] }) {
   }
 
   return (
-    <section className="relative text-center mb-12 p-8 bg-bg-card border border-border rounded-sm">
-      <div
-        className="absolute inset-[6px] border border-border rounded-sm pointer-events-none"
-        aria-hidden
-      />
-      <p className="text-xs tracking-[0.3em] text-ink-faint mb-5">— 今日の言葉 —</p>
-      <p className="text-xl font-medium leading-[2] text-ink mb-3 whitespace-pre-wrap">{entry.text}</p>
-      {entry.author && (
-        <p className="text-sm text-ink-light tracking-wide">— {entry.author}</p>
-      )}
-      <button
-        onClick={handleRandom}
-        className="mt-5 px-5 py-1.5 text-xs tracking-[0.15em] text-ink-light border border-border rounded-sm hover:bg-ai hover:text-white hover:border-ai transition-all"
-      >
-        くじを引く
-      </button>
+    <section className="relative mb-10 bg-bg-card border border-border rounded overflow-hidden">
+      <div className="h-[3px] bg-ai" />
+      <div className="p-7">
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-[10px] tracking-[0.35em] text-ink-faint uppercase">今日の言葉</p>
+          <button
+            onClick={handleRandom}
+            className="text-xs text-ink-faint border border-border rounded px-3 py-1 hover:border-ai hover:text-ai transition-all tracking-wide"
+          >
+            くじを引く
+          </button>
+        </div>
+        <p className="text-xl font-medium leading-[2.1] text-ink mb-4 whitespace-pre-wrap">
+          {entry.text}
+        </p>
+        <div className="flex items-end justify-between gap-4 text-sm">
+          <div>
+            {entry.author && (
+              <p className="text-ink-light whitespace-pre-wrap">— {entry.author}</p>
+            )}
+          </div>
+          <p className="text-xs text-ink-faint shrink-0">
+            {new Date(entry.created_at).toLocaleDateString('ja-JP', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })}
+          </p>
+        </div>
+      </div>
     </section>
   )
 }
@@ -259,54 +284,46 @@ function WordCard({
 
   if (editing) {
     return (
-      <div className="relative bg-bg-card border border-ai-light rounded-sm px-6 py-5">
+      <div className="relative bg-bg-card border border-ai rounded px-6 py-5">
         <form action={handleUpdate} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-ink-light tracking-wide">
-              言葉 <span className="text-[#8b3a3a]">*</span>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>
+              言葉 <span className="text-danger">*</span>
             </label>
             <textarea
               name="text"
               rows={3}
               required
               defaultValue={word.text}
-              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+              className={inputClass}
               onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation() }}
             />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-ink-light tracking-wide">出典・作者</label>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>出典・作者</label>
             <textarea
               name="author"
               rows={2}
               defaultValue={word.author}
               placeholder="例：老子、夏目漱石、映画名など"
-              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+              className={inputClass}
             />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-ink-light tracking-wide">メモ</label>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>メモ</label>
             <textarea
               name="memo"
               rows={2}
               defaultValue={word.memo}
               placeholder="感想や出会った場所など"
-              className="text-sm px-3 py-2 bg-bg border border-border rounded-sm text-ink outline-none focus:border-ai-light resize-y placeholder:text-ink-faint"
+              className={inputClass}
             />
           </div>
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="px-5 py-2 text-sm text-ink-light border border-border rounded-sm hover:border-ink-light transition-colors"
-            >
+          <div className="flex justify-end gap-3 pt-1">
+            <button type="button" onClick={() => setEditing(false)} className={btnSecondary}>
               キャンセル
             </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-7 py-2 text-sm bg-ai text-white rounded-sm hover:bg-ai-light transition-colors disabled:opacity-50"
-            >
+            <button type="submit" disabled={isPending} className={btnPrimary}>
               更新
             </button>
           </div>
@@ -316,8 +333,8 @@ function WordCard({
   }
 
   return (
-    <div className="relative bg-bg-card border border-border rounded-sm px-6 py-5 hover:shadow-[0_2px_12px_var(--shadow)] transition-shadow">
-      <div className="absolute top-3 right-3">
+    <div className="relative bg-bg-card border border-border rounded px-6 py-5 hover:border-border-strong hover:shadow-[0_2px_12px_var(--shadow-md)] transition-all duration-200">
+      <div className="absolute top-3.5 right-3.5">
         <WordMenu
           wordId={word.id}
           isPublic={word.is_public}
@@ -327,13 +344,19 @@ function WordCard({
           showToast={showToast}
         />
       </div>
-      <p className="text-base font-medium leading-[1.9] whitespace-pre-wrap text-ink mb-2 pr-8">
+      <p className="text-[15px] font-medium leading-[2.1] whitespace-pre-wrap text-ink mb-3 pr-9">
         {word.text}
       </p>
-      <div className="flex flex-col gap-y-1 text-xs text-ink-light">
-        {word.author && <span className="whitespace-pre-wrap">— {word.author}</span>}
-        {word.memo && <span className="whitespace-pre-wrap text-ink-faint italic">{word.memo}</span>}
-        <span className="text-ink-faint">{date}</span>
+      <div className="pt-3 border-t border-border flex items-start justify-between gap-4 text-xs">
+        <div className="flex flex-col gap-0.5">
+          {word.author && (
+            <span className="text-ink-light whitespace-pre-wrap">— {word.author}</span>
+          )}
+          {word.memo && (
+            <span className="text-ink-faint italic whitespace-pre-wrap">{word.memo}</span>
+          )}
+        </div>
+        <span className="text-ink-faint shrink-0 mt-0.5">{date}</span>
       </div>
     </div>
   )

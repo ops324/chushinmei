@@ -18,9 +18,7 @@ export default function ConfirmDialog({ open, message, onConfirm, onCancel }: Pr
 
   useEffect(() => {
     if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel()
-    }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel() }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [open, onCancel])
@@ -29,27 +27,30 @@ export default function ConfirmDialog({ open, message, onConfirm, onCancel }: Pr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px]"
       onClick={onCancel}
     >
       <div
-        className="bg-bg-card border border-border rounded-sm shadow-lg max-w-sm w-full mx-4 p-6"
+        className="bg-bg-card border border-border rounded-lg shadow-[0_8px_32px_var(--shadow-lg)] max-w-sm w-full mx-4 p-6"
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
-        <p className="text-sm text-ink leading-[1.8] mb-6">{message}</p>
+        <p className="text-sm text-ink leading-[1.9] mb-6">{message}</p>
         <div className="flex justify-end gap-3">
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="px-5 py-2 text-sm text-ink-light border border-border rounded-sm hover:border-ink-light transition-colors"
+            className="px-5 py-2 text-sm text-ink-light border border-border rounded hover:border-border-strong hover:text-ink transition-colors"
           >
             キャンセル
           </button>
           <button
             onClick={onConfirm}
-            className="px-5 py-2 text-sm bg-[#8b3a3a] text-white rounded-sm hover:bg-[#7a3030] transition-colors"
+            className="px-5 py-2 text-sm font-medium text-white rounded transition-colors"
+            style={{ background: 'var(--danger)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--danger-light)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--danger)')}
           >
             削除する
           </button>

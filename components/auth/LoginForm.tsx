@@ -9,6 +9,11 @@ const HASH_ERROR_MAP: Record<string, string> = {
   access_denied: 'アクセスが拒否されました',
 }
 
+const inputClass =
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
+
+const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
+
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, null)
   const [hashError, setHashError] = useState<string | null>(null)
@@ -20,7 +25,6 @@ export default function LoginForm() {
     const errorCode = params.get('error_code')
     if (errorCode) {
       setHashError(HASH_ERROR_MAP[errorCode] ?? params.get('error_description')?.replace(/\+/g, ' ') ?? 'エラーが発生しました')
-      // ハッシュをクリア
       window.history.replaceState(null, '', window.location.pathname)
     }
   }, [])
@@ -28,60 +32,60 @@ export default function LoginForm() {
   const displayError = state?.error ?? hashError
 
   return (
-    <div className="bg-bg-card border border-border rounded-lg p-6 shadow-sm">
+    <div className="bg-bg-card border border-border rounded-lg p-7">
       <form action={action} className="flex flex-col gap-4">
         {displayError && (
-          <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2">
+          <p
+            className="text-sm rounded px-3.5 py-2.5 border leading-[1.7]"
+            style={{ background: 'var(--danger-bg)', borderColor: 'var(--danger-border)', color: 'var(--danger)' }}
+          >
             {displayError}
           </p>
         )}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-ink-light" htmlFor="email">
-            メールアドレス
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass} htmlFor="email">メールアドレス</label>
           <input
             id="email"
             name="email"
             type="email"
             required
             autoComplete="email"
-            className="border border-border rounded px-3 py-2 text-ink bg-white focus:outline-none focus:border-ai text-sm"
+            className={inputClass}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-ink-light" htmlFor="password">
-            パスワード
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass} htmlFor="password">パスワード</label>
           <input
             id="password"
             name="password"
             type="password"
             required
             autoComplete="current-password"
-            className="border border-border rounded px-3 py-2 text-ink bg-white focus:outline-none focus:border-ai text-sm"
+            className={inputClass}
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="bg-ai text-white rounded py-2 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-50"
+          className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
         >
           {pending ? 'ログイン中...' : 'ログイン'}
         </button>
       </form>
 
-      <p className="text-center text-sm text-ink-faint mt-4">
-        <Link href="/auth/forgot-password" className="text-ai hover:underline">
-          パスワードを忘れた方
-        </Link>
-      </p>
-
-      <p className="text-center text-sm text-ink-faint mt-2">
-        アカウントがない方は{' '}
-        <Link href="/auth/register" className="text-ai hover:underline">
-          登録
-        </Link>
-      </p>
+      <div className="mt-5 pt-5 border-t border-border flex flex-col gap-2 text-center">
+        <p className="text-sm text-ink-faint">
+          <Link href="/auth/forgot-password" className="text-ai hover:underline underline-offset-4">
+            パスワードを忘れた方
+          </Link>
+        </p>
+        <p className="text-sm text-ink-faint">
+          アカウントがない方は{' '}
+          <Link href="/auth/register" className="text-ai hover:underline underline-offset-4">
+            登録
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

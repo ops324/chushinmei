@@ -3,13 +3,16 @@ import { Suspense } from 'react'
 
 export default function UpdatePasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg px-4">
+    <div className="min-h-screen flex items-center justify-center bg-bg px-4 py-12">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-semibold text-center text-ink mb-2">中心銘</h1>
-        <p className="text-center text-sm text-ink-faint mb-8">新しいパスワードを設定</p>
+        <div className="text-center mb-8">
+          <p className="text-[10px] tracking-[0.45em] text-ink-faint mb-3">中心銘</p>
+          <h1 className="text-xl font-semibold text-ink mb-1.5">新しいパスワードを設定</h1>
+          <p className="text-sm text-ink-faint">6文字以上で入力してください。</p>
+        </div>
         <Suspense fallback={
-          <div className="bg-bg-card border border-border rounded-lg p-6 shadow-sm">
-            <p className="text-sm text-ink-light text-center">読み込み中...</p>
+          <div className="bg-bg-card border border-border rounded-lg p-7">
+            <p className="text-sm text-ink-faint text-center">読み込み中...</p>
           </div>
         }>
           <UpdatePasswordForm />

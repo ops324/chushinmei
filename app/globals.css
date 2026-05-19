@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f5f0e8;
-  --bg-card: #faf7f2;
-  --ink: #2c2c2c;
-  --ink-light: #6b6b6b;
-  --ink-faint: #b0a898;
-  --ai: #1a3a5c;
-  --ai-light: #2d5a8e;
-  --border: #ddd6c8;
-  --shadow: rgba(44, 44, 44, 0.08);
+  /* ─ Backgrounds ─────────────────────────────── */
+  --bg:          #f0ebe0;   /* washi paper */
+  --bg-card:     #faf6ee;   /* warm card   */
+  --bg-surface:  #e5dfd4;   /* subtle surface / hover */
+
+  /* ─ Typography ──────────────────────────────── */
+  --ink:         #1c1916;   /* sumi black  */
+  --ink-light:   #6a6058;   /* warm gray   */
+  --ink-faint:   #a89880;   /* faded warm  */
+
+  /* ─ Accent — deep editorial navy ───────────── */
+  --ai:          #1e3654;
+  --ai-light:    #2a4e7c;
+  --ai-muted:    #e4ecf6;   /* very light tint for focus rings */
+
+  /* ─ Borders ─────────────────────────────────── */
+  --border:        #d5cec0;
+  --border-strong: #bcb3a4;
+
+  /* ─ Shadows ─────────────────────────────────── */
+  --shadow:    rgba(26, 23, 20, 0.04);
+  --shadow-md: rgba(26, 23, 20, 0.09);
+  --shadow-lg: rgba(26, 23, 20, 0.16);
+
+  /* ─ Semantic — danger ───────────────────────── */
+  --danger:        #8c1e1e;
+  --danger-light:  #a62828;
+  --danger-bg:     #fdf0f0;
+  --danger-border: #f0c4c4;
+
+  /* ─ Semantic — success ──────────────────────── */
+  --success:        #1c5030;
+  --success-bg:     #f0fdf5;
+  --success-border: #b8e8c8;
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-bg-card: var(--bg-card);
-  --color-ink: var(--ink);
-  --color-ink-light: var(--ink-light);
-  --color-ink-faint: var(--ink-faint);
-  --color-ai: var(--ai);
-  --color-ai-light: var(--ai-light);
-  --color-border: var(--border);
+  --color-bg:            var(--bg);
+  --color-bg-card:       var(--bg-card);
+  --color-bg-surface:    var(--bg-surface);
+  --color-ink:           var(--ink);
+  --color-ink-light:     var(--ink-light);
+  --color-ink-faint:     var(--ink-faint);
+  --color-ai:            var(--ai);
+  --color-ai-light:      var(--ai-light);
+  --color-ai-muted:      var(--ai-muted);
+  --color-border:        var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-danger:        var(--danger);
+  --color-danger-light:  var(--danger-light);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -28,8 +62,25 @@ body {
   color: var(--ink);
   font-family: 'Noto Serif JP', serif;
   line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 input, textarea, button, select {
   font-family: inherit;
+}
+
+::selection {
+  background: var(--ai-muted);
+  color: var(--ai);
+}
+
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
 }
