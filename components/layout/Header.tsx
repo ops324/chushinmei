@@ -21,11 +21,14 @@ export default async function Header() {
       className="bg-bg-card border-b border-border sticky top-0 z-40"
       style={{ borderTop: '3px solid var(--ai)' }}
     >
-      <div className="max-w-2xl mx-auto w-full px-4 h-[52px] flex items-center justify-between">
-        <Link href="/" className="text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors">
+      <div className="max-w-2xl mx-auto w-full px-4 h-[52px] grid grid-cols-3 items-center">
+        <div aria-hidden />
+        <Link href="/" className="justify-self-center text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors">
           中心銘
         </Link>
-        {user && <AccountMenu displayName={displayName} email={user.email ?? ''} />}
+        <div className="justify-self-end">
+          {user && <AccountMenu displayName={displayName} email={user.email ?? ''} />}
+        </div>
       </div>
     </header>
   )
