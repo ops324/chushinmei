@@ -11,6 +11,7 @@ import {
 } from '@/lib/actions/auth-actions'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import Avatar from '@/components/ui/Avatar'
+import AvatarCropDialog from '@/components/account/AvatarCropDialog'
 
 const inputClass =
   'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
@@ -38,45 +39,62 @@ function Feedback({ state }: { state: FormState }) {
 }
 
 export function AvatarForm({ current, name }: { current: string | null; name: string }) {
-  const [state, action, pending] = useActionState(updateAvatar, null)
-  const [removeState, setRemoveState] = useState<FormState>(null)
+  const [state, setState] = useState<FormState>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [pending, startUpload] = useTransition()
   const [removing, startRemove] = useTransition()
-  const fileRef = useRef<HTMLInputElement>(null)
+  const croppedFileRef = useRef<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
-    setPreview(f ? URL.createObjectURL(f) : null)
+    if (f) setCropSrc(URL.createObjectURL(f))
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function onCropConfirm(blob: Blob) {
+    croppedFileRef.current = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
+    setPreview(URL.createObjectURL(blob))
+    setCropSrc(null)
+  }
+
+  function handleUpload() {
+    if (!croppedFileRef.current) {
+      setState({ error: '画像を選択してください' })
+      return
+    }
+    setState(null)
+    const fd = new FormData()
+    fd.append('avatar', croppedFileRef.current)
+    startUpload(async () => {
+      setState(await updateAvatar(null, fd))
+    })
   }
 
   function handleRemove() {
-    setRemoveState(null)
+    setState(null)
     startRemove(async () => {
       const res = await removeAvatar()
-      setRemoveState(res)
+      setState(res)
       if (!res?.error) {
         setPreview(null)
-        if (fileRef.current) fileRef.current.value = ''
+        croppedFileRef.current = null
       }
     })
   }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <Feedback state={state ?? removeState} />
+    <div className="flex flex-col gap-4">
+      <Feedback state={state} />
       <div className="flex items-center gap-4">
         <Avatar src={preview ?? current} name={name} size={64} />
-        <input
-          ref={fileRef}
-          type="file"
-          name="avatar"
-          accept="image/*"
-          required
-          onChange={onFileChange}
-          className="text-sm text-ink-light file:mr-3 file:rounded file:border file:border-border file:bg-bg file:px-3 file:py-1.5 file:text-sm file:text-ink hover:file:border-border-strong file:cursor-pointer"
-        />
+        <label className="text-sm text-ink border border-border rounded px-4 py-2 cursor-pointer hover:border-border-strong hover:bg-bg-surface transition-colors">
+          画像を選択
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={onPick} className="hidden" />
+        </label>
       </div>
-      <p className="text-xs text-ink-faint leading-[1.7]">JPG / PNG / GIF など、2MB まで。円形に切り抜かれて表示されます。</p>
+      <p className="text-xs text-ink-faint leading-[1.7]">JPG / PNG / GIF など、2MB まで。選択後にズーム・位置を調整して円形に切り抜けます。</p>
       <div className="flex justify-end gap-3">
         {current && (
           <button
@@ -88,11 +106,14 @@ export function AvatarForm({ current, name }: { current: string | null; name: st
             {removing ? '削除中...' : '画像を削除'}
           </button>
         )}
-        <button type="submit" disabled={pending} className={submitClass}>
+        <button type="button" onClick={handleUpload} disabled={pending || !preview} className={submitClass}>
           {pending ? 'アップロード中...' : 'アップロード'}
         </button>
       </div>
-    </form>
+      {cropSrc && (
+        <AvatarCropDialog src={cropSrc} onConfirm={onCropConfirm} onCancel={() => setCropSrc(null)} />
+      )}
+    </div>
   )
 }
 
