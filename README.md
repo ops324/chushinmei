@@ -19,6 +19,7 @@
 - **SNS シェア** — X・LINE・Facebook への投稿、OS 標準の共有シート（モバイル）、URL コピー（非セキュア環境向けフォールバック付き）に対応。自分の一覧と公開ページの双方から共有可能。引用文の二重表示を避けるため共有メッセージ本文は URL のみとし、言葉・出典は OGP カードに集約
 - **OGP カード画像** — シェア時に SNS のプレビューへ和紙基調のブランドカード画像（`og:image` / Twitter `summary_large_image`）を表示し、`og:title` / `og:description` に言葉・出典を掲載
 - **アカウント設定** — 右上のアカウントメニューから設定ページ（`/account`）へ遷移し、表示名・メールアドレス・パスワードの変更、アカウント削除を操作可能。ログアウトはメニューに集約
+- **プロフィール画像** — アカウント設定からアイコン画像をアップロード・差し替え・削除（Supabase Storage の `avatars` バケットに保存）。未設定時は表示名の頭文字を表示
 - **楽観的 UI** — 削除を即座に反映し体感速度を向上
 
 ## 技術スタック
@@ -72,6 +73,8 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 > 新しいテーブルを追加する際は、Data API（supabase-js / PostgREST）からアクセスするため必ず `GRANT` 文を含めてください（詳細はスキーマ冒頭のコメント参照）。
 
 > アカウント削除機能には `delete_own_account()` 関数が必要です。`supabase-schema.sql` に含まれているため新規セットアップでは自動で作成されます。既存プロジェクトには [`supabase-migration-delete-account.sql`](supabase-migration-delete-account.sql) を一度だけ実行してください。
+
+> プロフィール画像機能には `profiles.avatar_url` 列と `avatars` ストレージバケット（＋RLS）が必要です。新規セットアップは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-avatar.sql`](supabase-migration-avatar.sql) を一度だけ実行してください。
 
 ### 5. パスワードリセット用メールテンプレートの設定
 

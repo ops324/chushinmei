@@ -3,13 +3,15 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { logout } from '@/lib/actions/auth-actions'
+import Avatar from '@/components/ui/Avatar'
 
 type Props = {
   displayName: string
   email: string
+  avatarUrl: string | null
 }
 
-export default function AccountMenu({ displayName, email }: Props) {
+export default function AccountMenu({ displayName, email, avatarUrl }: Props) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -32,7 +34,6 @@ export default function AccountMenu({ displayName, email }: Props) {
   }, [open])
 
   const label = displayName || email
-  const initial = (displayName || email || '?').trim().charAt(0).toUpperCase()
 
   return (
     <div ref={menuRef} className="relative">
@@ -44,9 +45,7 @@ export default function AccountMenu({ displayName, email }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-ai text-white text-[11px] font-medium shrink-0">
-          {initial}
-        </span>
+        <Avatar src={avatarUrl} name={displayName || email} size={24} />
         <span className="text-xs text-ink-light tracking-wide truncate hidden sm:inline">{label}</span>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-ink-faint shrink-0" aria-hidden>
           <polyline points="6 9 12 15 18 9" />

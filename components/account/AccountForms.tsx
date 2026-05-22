@@ -1,13 +1,16 @@
 'use client'
 
-import { useActionState, useState, useTransition } from 'react'
+import { useActionState, useState, useTransition, useRef } from 'react'
 import {
   updateDisplayName,
   updateEmail,
   changePassword,
   deleteAccount,
+  updateAvatar,
+  removeAvatar,
 } from '@/lib/actions/auth-actions'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import Avatar from '@/components/ui/Avatar'
 
 const inputClass =
   'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
@@ -31,6 +34,65 @@ function Feedback({ state }: { state: FormState }) {
     >
       {state.error ?? state.success}
     </p>
+  )
+}
+
+export function AvatarForm({ current, name }: { current: string | null; name: string }) {
+  const [state, action, pending] = useActionState(updateAvatar, null)
+  const [removeState, setRemoveState] = useState<FormState>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [removing, startRemove] = useTransition()
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]
+    setPreview(f ? URL.createObjectURL(f) : null)
+  }
+
+  function handleRemove() {
+    setRemoveState(null)
+    startRemove(async () => {
+      const res = await removeAvatar()
+      setRemoveState(res)
+      if (!res?.error) {
+        setPreview(null)
+        if (fileRef.current) fileRef.current.value = ''
+      }
+    })
+  }
+
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <Feedback state={state ?? removeState} />
+      <div className="flex items-center gap-4">
+        <Avatar src={preview ?? current} name={name} size={64} />
+        <input
+          ref={fileRef}
+          type="file"
+          name="avatar"
+          accept="image/*"
+          required
+          onChange={onFileChange}
+          className="text-sm text-ink-light file:mr-3 file:rounded file:border file:border-border file:bg-bg file:px-3 file:py-1.5 file:text-sm file:text-ink hover:file:border-border-strong file:cursor-pointer"
+        />
+      </div>
+      <p className="text-xs text-ink-faint leading-[1.7]">JPG / PNG / GIF など、2MB まで。正方形に切り抜かれて表示されます。</p>
+      <div className="flex justify-end gap-3">
+        {current && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="px-5 py-2.5 text-sm text-ink-light border border-border rounded hover:border-border-strong hover:text-ink transition-colors disabled:opacity-40"
+          >
+            {removing ? '削除中...' : '画像を削除'}
+          </button>
+        )}
+        <button type="submit" disabled={pending} className={submitClass}>
+          {pending ? 'アップロード中...' : 'アップロード'}
+        </button>
+      </div>
+    </form>
   )
 }
 

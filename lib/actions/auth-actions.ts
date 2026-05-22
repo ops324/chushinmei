@@ -263,3 +263,50 @@ export async function deleteAccount(): Promise<{ error: string } | void> {
   await supabase.auth.signOut()
   redirect('/auth/login')
 }
+
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024
+
+export async function updateAvatar(
+  _prevState: { error?: string; success?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: string } | null> {
+  const file = formData.get('avatar') as File | null
+  if (!file || file.size === 0) return { error: '画像を選択してください' }
+  if (!file.type.startsWith('image/')) return { error: '画像ファイルを選択してください' }
+  if (file.size > MAX_AVATAR_BYTES) return { error: '画像は2MB以下にしてください' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '認証されていません。再度ログインしてください' }
+
+  const path = `${user.id}/avatar`
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type })
+  if (uploadError) return { error: toUserMessage(uploadError) }
+
+  const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path)
+  const avatarUrl = `${pub.publicUrl}?v=${Date.now()}`
+
+  const { error } = await supabase.from('profiles').upsert({ id: user.id, avatar_url: avatarUrl })
+  if (error) return { error: toUserMessage(error) }
+
+  revalidatePath('/account')
+  revalidatePath('/')
+  return { success: 'アイコン画像を更新しました' }
+}
+
+export async function removeAvatar(): Promise<{ error?: string; success?: string } | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '認証されていません。再度ログインしてください' }
+
+  await supabase.storage.from('avatars').remove([`${user.id}/avatar`])
+
+  const { error } = await supabase.from('profiles').upsert({ id: user.id, avatar_url: null })
+  if (error) return { error: toUserMessage(error) }
+
+  revalidatePath('/account')
+  revalidatePath('/')
+  return { success: 'アイコン画像を削除しました' }
+}

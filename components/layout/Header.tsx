@@ -7,13 +7,15 @@ export default async function Header() {
   const { data: { user } } = await supabase.auth.getUser()
 
   let displayName = ''
+  let avatarUrl: string | null = null
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('display_name')
+      .select('display_name, avatar_url')
       .eq('id', user.id)
       .maybeSingle()
     displayName = profile?.display_name ?? ''
+    avatarUrl = profile?.avatar_url ?? null
   }
 
   return (
@@ -27,7 +29,7 @@ export default async function Header() {
           中心銘
         </Link>
         <div className="justify-self-end">
-          {user && <AccountMenu displayName={displayName} email={user.email ?? ''} />}
+          {user && <AccountMenu displayName={displayName} email={user.email ?? ''} avatarUrl={avatarUrl} />}
         </div>
       </div>
     </header>

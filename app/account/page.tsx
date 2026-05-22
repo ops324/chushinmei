@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import {
+  AvatarForm,
   DisplayNameForm,
   EmailForm,
   PasswordForm,
@@ -46,7 +47,7 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name')
+    .select('display_name, avatar_url')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -68,6 +69,10 @@ export default async function AccountPage() {
         </div>
 
         <div className="flex flex-col gap-5">
+          <Section title="アイコン画像">
+            <AvatarForm current={profile?.avatar_url ?? null} name={profile?.display_name ?? (user.email ?? '')} />
+          </Section>
+
           <Section title="プロフィール">
             <DisplayNameForm current={profile?.display_name ?? ''} />
           </Section>
