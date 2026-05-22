@@ -55,7 +55,8 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
       try {
         await deleteWord(id)
         showToast('言葉を削除しました')
-      } catch {
+      } catch (e) {
+        console.error(e)
         showToast('削除に失敗しました', 'error')
       }
     })
@@ -67,7 +68,8 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
         await addWord(formData)
         setFormOpen(false)
         showToast('言葉を記しました')
-      } catch {
+      } catch (e) {
+        console.error(e)
         showToast('追加に失敗しました', 'error')
       }
     })
@@ -204,6 +206,8 @@ function TodayWord({ words }: { words: Word[] }) {
     const seed = new Date().toDateString()
     let hash = 0
     for (const c of seed) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff
+    // new Date() はクライアント専用。SSRハイドレーション不一致を避けるため effect 内で算出する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIdx(Math.abs(hash) % words.length)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -276,7 +280,8 @@ function WordCard({
         await updateWord(word.id, formData)
         setEditing(false)
         showToast('言葉を更新しました')
-      } catch {
+      } catch (e) {
+        console.error(e)
         showToast('更新に失敗しました', 'error')
       }
     })
@@ -339,6 +344,8 @@ function WordCard({
           wordId={word.id}
           isPublic={word.is_public}
           shareId={word.share_id}
+          text={word.text}
+          author={word.author}
           onEdit={() => setEditing(true)}
           onDelete={onDelete}
           showToast={showToast}

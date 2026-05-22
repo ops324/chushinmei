@@ -24,6 +24,8 @@ export default function LoginForm() {
     const params = new URLSearchParams(hash)
     const errorCode = params.get('error_code')
     if (errorCode) {
+      // URLハッシュ（クライアント専用）からのエラー読み取りなので effect 内 setState が妥当
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHashError(HASH_ERROR_MAP[errorCode] ?? params.get('error_description')?.replace(/\+/g, ' ') ?? 'エラーが発生しました')
       window.history.replaceState(null, '', window.location.pathname)
     }

@@ -2,20 +2,26 @@
 
 import { useState, useRef, useEffect, useTransition } from 'react'
 import { toggleWordPublic } from '@/lib/actions/word-actions'
+import ShareDialog from '@/components/words/ShareDialog'
 
 type Props = {
   wordId: string
   isPublic: boolean
   shareId: string | null
+  text: string
+  author: string
   onEdit: () => void
   onDelete: () => void
   showToast: (message: string, type?: 'success' | 'error') => void
 }
 
-export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, showToast }: Props) {
+export default function WordMenu({ wordId, isPublic, shareId, text, author, onEdit, onDelete, showToast }: Props) {
   const [open, setOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
   const [isPending, startTransition] = useTransition()
   const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -23,28 +29,35 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
         setOpen(false)
       }
     }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
     if (open) {
       document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKey)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+        document.removeEventListener('keydown', handleKey)
+      }
     }
   }, [open])
 
-  async function handleShare() {
+  function handleShare() {
     setOpen(false)
     if (isPublic && shareId) {
-      const url = `${window.location.origin}/shared/${shareId}`
-      try {
-        await navigator.clipboard.writeText(url)
-        showToast('URLをコピーしました')
-      } catch {
-        showToast('コピーに失敗しました', 'error')
-      }
+      setShareUrl(`${window.location.origin}/shared/${shareId}`)
+      setShareOpen(true)
     } else {
       startTransition(async () => {
         try {
-          await toggleWordPublic(wordId, true)
-          showToast('公開URLを生成しました。もう一度タップでコピーできます')
-        } catch {
+          const newShareId = await toggleWordPublic(wordId, true)
+          setShareUrl(`${window.location.origin}/shared/${newShareId}`)
+          setShareOpen(true)
+        } catch (e) {
+          console.error(e)
           showToast('操作に失敗しました', 'error')
         }
       })
@@ -57,10 +70,13 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
   return (
     <div ref={menuRef} className="relative">
       <button
+        ref={triggerRef}
         onClick={() => setOpen(o => !o)}
         disabled={isPending}
         className="p-1.5 text-ink-faint hover:text-ink rounded hover:bg-bg-surface transition-all disabled:opacity-50"
         aria-label="メニューを開く"
+        aria-haspopup="menu"
+        aria-expanded={open}
       >
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
           <circle cx="8" cy="3" r="1.4" />
@@ -70,8 +86,9 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 bg-bg-card border border-border rounded shadow-[0_4px_20px_var(--shadow-md)] z-10 min-w-[148px] py-1 overflow-hidden">
+        <div role="menu" className="absolute right-0 top-full mt-1.5 bg-bg-card border border-border rounded shadow-[0_4px_20px_var(--shadow-md)] z-10 min-w-[148px] py-1 overflow-hidden">
           <button
+            role="menuitem"
             onClick={handleEdit}
             className="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-bg-surface transition-colors flex items-center gap-2.5"
           >
@@ -82,6 +99,7 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
             編集
           </button>
           <button
+            role="menuitem"
             onClick={handleShare}
             className="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-bg-surface transition-colors flex items-center gap-2.5"
           >
@@ -90,15 +108,13 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
               <polyline points="16 6 12 2 8 6" />
               <line x1="12" y1="2" x2="12" y2="15" />
             </svg>
-            {isPublic && shareId ? 'URLをコピー' : 'シェア'}
+            シェア
           </button>
           <div className="mx-3 my-1 border-t border-border" />
           <button
+            role="menuitem"
             onClick={handleDelete}
-            className="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2.5"
-            style={{ color: 'var(--danger)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--danger-bg)')}
-            onMouseLeave={e => (e.currentTarget.style.background = '')}
+            className="w-full text-left px-4 py-2.5 text-sm text-danger hover:bg-danger-bg focus-visible:bg-danger-bg transition-colors flex items-center gap-2.5"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="3 6 5 6 21 6" />
@@ -108,6 +124,14 @@ export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, 
           </button>
         </div>
       )}
+
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        url={shareUrl}
+        quote={text}
+        author={author}
+      />
     </div>
   )
 }

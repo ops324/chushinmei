@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中心銘 — デモ画面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f5f0e8;
+    --bg-card: #faf7f2;
+    --ink: #2c2c2c;
+    --ink-light: #6b6b6b;
+    --ink-faint: #b0a898;
+    --ai: #1a3a5c;
+    --ai-light: #2d5a8e;
+    --border: #ddd6c8;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 672px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-title {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+  }
+  .header-btn {
+    font-size: 12px;
+    color: var(--ink-faint);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 4px 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Main */
+  main {
+    max-width: 672px;
+    margin: 0 auto;
+    padding: 32px 16px;
+  }
+
+  /* Today's Word */
+  .today-word {
+    position: relative;
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .today-word::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .today-label {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+  }
+  .today-text {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 2;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+  }
+  .today-author {
+    font-size: 14px;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+  }
+  .today-btn {
+    margin-top: 20px;
+    padding: 6px 20px;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--ink-light);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Add button */
+  .add-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  /* Search */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .search-input {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--ink);
+    outline: none;
+    font-family: inherit;
+  }
+  .search-count {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* Word cards */
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .card {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px 24px;
+  }
+  .card:hover {
+    box-shadow: 0 2px 12px rgba(44, 44, 44, 0.08);
+  }
+  .card-menu {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 16px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    letter-spacing: 2px;
+  }
+  .card-text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    margin-bottom: 8px;
+    padding-right: 32px;
+  }
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+  .card-memo {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+  .card-date {
+    margin-left: auto;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <span class="header-title">中心銘</span>
+    <button class="header-btn">ログアウト</button>
+  </div>
+</header>
+
+<main>
+  <!-- Today's Word -->
+  <section class="today-word">
+    <p class="today-label">— 今日の言葉 —</p>
+    <p class="today-text">大切なものは、目に見えない。</p>
+    <p class="today-author">— サン＝テグジュペリ（星の王子さま）</p>
+    <button class="today-btn">くじを引く</button>
+  </section>
+
+  <!-- Add Button -->
+  <section style="margin-bottom: 32px;">
+    <button class="add-btn">＋ 言葉を記す</button>
+  </section>
+
+  <!-- Search -->
+  <section class="search-wrap">
+    <input class="search-input" type="text" placeholder="言葉・出典で検索...">
+    <span class="search-count">12 件</span>
+  </section>
+
+  <!-- Word List -->
+  <section class="cards">
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">春風や闘志いだきて丘に立つ</p>
+      <div class="card-meta">
+        <span>— 高浜虚子</span>
+        <span class="card-memo">新年度の始まりに。穏やかだけど力強い。</span>
+        <span class="card-date">2026年3月25日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">一日一日が、自分史の一ページ。</p>
+      <div class="card-meta">
+        <span class="card-memo">日記を書き始めたとき、自分で書いた言葉。</span>
+        <span class="card-date">2026年3月22日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">完璧を目指すよりも、まず終わらせろ。</p>
+      <div class="card-meta">
+        <span>— マーク・ザッカーバーグ</span>
+        <span class="card-memo">開発で手が止まったとき、この言葉に救われた。</span>
+        <span class="card-date">2026年3月18日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">迷ったときは、より勇気のいる方を選べ。</p>
+      <div class="card-meta">
+        <span class="card-memo">祖父がよく言っていた言葉。判断に迷うとき思い出す。</span>
+        <span class="card-date">2026年3月10日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">世界は一冊の本であり、旅をしない者はたった一ページしか読んでいない。</p>
+      <div class="card-meta">
+        <span>— アウグスティヌス</span>
+        <span class="card-memo">旅行前に見つけた言葉。視野を広げたい。</span>
+        <span class="card-date">2026年3月5日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">大切なものは、目に見えない。</p>
+      <div class="card-meta">
+        <span>— サン＝テグジュペリ（星の王子さま）</span>
+        <span class="card-memo">友人からの誕生日プレゼントの本から。</span>
+        <span class="card-date">2026年2月28日</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="card-menu">⋮</button>
+      <p class="card-text">Stay hungry, stay foolish.</p>
+      <div class="card-meta">
+        <span>— Steve Jobs</span>
+        <span class="card-memo">2005年スタンフォード大学卒業式スピーチより。初心を忘れない。</span>
+        <span class="card-date">2026年2月3日</span>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+</body>
+</html>

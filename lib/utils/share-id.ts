@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 export async function generateUniqueShareId(supabase: SupabaseClient): Promise<string> {
   for (let i = 0; i < 5; i++) {
     const id = nanoid(12)
-    const { data } = await supabase.from('words').select('id').eq('share_id', id).single()
+    const { data } = await supabase.from('words').select('id').eq('share_id', id).maybeSingle()
     if (!data) return id
   }
   return nanoid(16)

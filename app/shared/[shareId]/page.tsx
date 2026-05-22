@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import PublicShare from '@/components/shared/PublicShare'
 
 type Props = {
   params: Promise<{ shareId: string }>
@@ -59,7 +60,7 @@ export default async function SharedWordPage({ params }: Props) {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-16">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="relative text-center max-w-lg w-full p-10 bg-bg-card border border-border rounded overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-ai" />
           <div
@@ -75,6 +76,8 @@ export default async function SharedWordPage({ params }: Props) {
           )}
           <p className="text-xs text-ink-faint mt-7">{date}</p>
         </div>
+
+        <PublicShare quote={word.text} author={word.author ?? ''} />
       </main>
     </div>
   )

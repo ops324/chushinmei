@@ -9,7 +9,7 @@
   /* ─ Typography ──────────────────────────────── */
   --ink:         #1c1916;   /* sumi black  */
   --ink-light:   #6a6058;   /* warm gray   */
-  --ink-faint:   #a89880;   /* faded warm  */
+  --ink-faint:   #736756;   /* faded warm — WCAG AA(4.5:1) on bg / bg-card */
 
   /* ─ Accent — deep editorial navy ───────────── */
   --ai:          #1e3654;
@@ -51,6 +51,7 @@
   --color-border-strong: var(--border-strong);
   --color-danger:        var(--danger);
   --color-danger-light:  var(--danger-light);
+  --color-danger-bg:     var(--danger-bg);
 }
 
 html {

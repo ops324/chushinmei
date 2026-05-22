@@ -34,6 +34,8 @@ function toUserMessage(error: { message?: string; status?: number }): string {
     if (msgLower.includes(key.toLowerCase())) return jaMsg
   }
   // それ以外（{}、DOCTYPE、Unexpected token 等）はすべて接続エラーとして扱う
+  // 未分類のエラーはサーバーログに残し、本番でバグが不可視にならないようにする
+  console.error('[auth] 未分類エラー:', error.status ?? '-', msg)
   return CONNECTION_ERROR_MSG
 }
 
@@ -90,6 +92,7 @@ export async function register(
   redirect('/')
 }
 
+// Google OAuth は現在UIを非表示にしているため未使用だが、再有効化時に使うため残している
 export async function loginWithGoogle() {
   const supabase = await createClient()
   const headersList = await headers()

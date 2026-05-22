@@ -1,27 +1,28 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import ShareActions from '@/components/ui/ShareActions'
 
 type Props = {
   open: boolean
-  message: string
-  onConfirm: () => void
-  onCancel: () => void
+  onClose: () => void
+  url: string
+  quote: string
+  author: string
 }
 
-export default function ConfirmDialog({ open, message, onConfirm, onCancel }: Props) {
-  const cancelRef = useRef<HTMLButtonElement>(null)
+export default function ShareDialog({ open, onClose, url, quote, author }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (open) cancelRef.current?.focus()
+    if (open) closeRef.current?.focus()
   }, [open])
 
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { onCancel(); return }
-      // フォーカスをダイアログ内に閉じ込める（背景にタブで抜けないように）
+      if (e.key === 'Escape') { onClose(); return }
       if (e.key === 'Tab' && dialogRef.current) {
         const focusables = dialogRef.current.querySelectorAll<HTMLElement>('button')
         if (focusables.length === 0) return
@@ -36,14 +37,14 @@ export default function ConfirmDialog({ open, message, onConfirm, onCancel }: Pr
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [open, onCancel])
+  }, [open, onClose])
 
   if (!open) return null
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px]"
-      onClick={onCancel}
+      onClick={onClose}
     >
       <div
         ref={dialogRef}
@@ -51,22 +52,17 @@ export default function ConfirmDialog({ open, message, onConfirm, onCancel }: Pr
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-describedby="confirm-dialog-desc"
+        aria-label="共有"
       >
-        <p id="confirm-dialog-desc" className="text-sm text-ink leading-[1.9] mb-6">{message}</p>
-        <div className="flex justify-end gap-3">
+        <p className="text-sm font-medium text-ink mb-4">共有する</p>
+        <ShareActions url={url} quote={quote} author={author} />
+        <div className="flex justify-end mt-5">
           <button
-            ref={cancelRef}
-            onClick={onCancel}
+            ref={closeRef}
+            onClick={onClose}
             className="px-5 py-2 text-sm text-ink-light border border-border rounded hover:border-border-strong hover:text-ink transition-colors"
           >
-            キャンセル
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-5 py-2 text-sm font-medium text-white rounded bg-danger hover:bg-danger-light focus-visible:bg-danger-light transition-colors"
-          >
-            削除する
+            閉じる
           </button>
         </div>
       </div>

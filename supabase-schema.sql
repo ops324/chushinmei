@@ -1,6 +1,14 @@
 -- ============================================================
 -- 中心銘 Supabaseスキーマ
 -- Supabase SQL Editorでこのスクリプトを実行してください
+--
+-- 【注意】テーブルを新規追加する際は必ずGRANT文を含めること
+-- 2026-05-30以降、publicスキーマの新規テーブルはGRANTなしでは
+-- Data API（supabase-js / PostgREST）からアクセス不可になる
+-- 例:
+--   GRANT SELECT ON public.your_table TO anon;
+--   GRANT SELECT, INSERT, UPDATE, DELETE ON public.your_table TO authenticated;
+--   GRANT SELECT, INSERT, UPDATE, DELETE ON public.your_table TO service_role;
 -- ============================================================
 
 -- プロファイル（auth.usersの拡張）
@@ -21,6 +29,16 @@ CREATE TABLE public.words (
   share_id   TEXT UNIQUE,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
+
+-- Data API アクセス権付与（PostgREST / supabase-js 用）
+-- words: 未ログインユーザーは公開言葉のみSELECT可、ログイン済みユーザーはCRUD可
+GRANT SELECT                       ON public.words    TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.words  TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.words  TO service_role;
+
+-- profiles: ログイン済みユーザーのみCRUD可
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
 
 -- RLS有効化
 ALTER TABLE public.words    ENABLE ROW LEVEL SECURITY;

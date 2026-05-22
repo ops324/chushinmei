@@ -9,7 +9,7 @@ export async function addWord(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const text = (formData.get('text') as string).trim()
+  const text = ((formData.get('text') as string | null) ?? '').trim()
   if (!text) throw new Error('言葉は必須です')
 
   await supabase.from('words').insert({
@@ -27,7 +27,7 @@ export async function updateWord(id: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const text = (formData.get('text') as string).trim()
+  const text = ((formData.get('text') as string | null) ?? '').trim()
   if (!text) throw new Error('言葉は必須です')
 
   await supabase.from('words').update({
@@ -61,4 +61,5 @@ export async function toggleWordPublic(wordId: string, isPublic: boolean) {
     .eq('user_id', user.id)
 
   revalidatePath('/')
+  return shareId
 }
