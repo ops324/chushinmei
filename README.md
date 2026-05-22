@@ -38,6 +38,7 @@
 - **`proxy.ts`**（Next.js 16 で `middleware.ts` から改名された規約）でセッション更新と未認証リダイレクトを実装
 - **日付ベースのハッシュ** で「今日の言葉」を同一ユーザー・同一日には同じ結果に
 - **OGP メタデータ動的生成** で共有リンクの SNS プレビューに言葉と作者を表示
+- **アカウント管理** — ログアウト・設定への入口を右上メニューに集約（ヒューリスティック評価に基づく導線設計）。本人によるアカウント削除は `SECURITY DEFINER` 関数 `delete_own_account()` 経由で自分の行のみを削除し、`ON DELETE CASCADE` で言葉・プロフィールを連動削除
 
 ## セットアップ
 
@@ -69,6 +70,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
 Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supabase-schema.sql) を実行します（テーブル・RLS ポリシー・プロファイル自動生成トリガーを作成）。
 
 > 新しいテーブルを追加する際は、Data API（supabase-js / PostgREST）からアクセスするため必ず `GRANT` 文を含めてください（詳細はスキーマ冒頭のコメント参照）。
+
+> アカウント削除機能には `delete_own_account()` 関数が必要です。`supabase-schema.sql` に含まれているため新規セットアップでは自動で作成されます。既存プロジェクトには [`supabase-migration-delete-account.sql`](supabase-migration-delete-account.sql) を一度だけ実行してください。
 
 ### 5. パスワードリセット用メールテンプレートの設定
 
