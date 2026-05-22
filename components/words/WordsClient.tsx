@@ -344,8 +344,6 @@ function WordCard({
           wordId={word.id}
           isPublic={word.is_public}
           shareId={word.share_id}
-          text={word.text}
-          author={word.author}
           onEdit={() => setEditing(true)}
           onDelete={onDelete}
           showToast={showToast}

@@ -24,14 +24,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const word = await getWord(shareId)
   if (!word) return { title: '中心銘' }
 
-  const title = `「${word.text.slice(0, 30)}」— 中心銘`
+  const quote = word.text.length > 70 ? `${word.text.slice(0, 70)}…` : word.text
+  const headline = `「${quote}」`
   const description = word.author ? `— ${word.author}` : '中心銘より'
 
   return {
-    title,
+    title: `${headline} — 中心銘`,
     description,
     openGraph: {
-      title: `「${word.text.slice(0, 30)}」`,
+      title: headline,
       description,
       siteName: '中心銘',
       type: 'article',
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `「${word.text.slice(0, 30)}」`,
+      title: headline,
       description,
       images: ['/og.png'],
     },
@@ -89,7 +90,7 @@ export default async function SharedWordPage({ params }: Props) {
           <p className="text-xs text-ink-faint mt-7">{date}</p>
         </div>
 
-        <PublicShare quote={word.text} author={word.author ?? ''} />
+        <PublicShare />
       </main>
     </div>
   )

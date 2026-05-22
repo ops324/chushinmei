@@ -7,11 +7,9 @@ type Props = {
   open: boolean
   onClose: () => void
   url: string
-  quote: string
-  author: string
 }
 
-export default function ShareDialog({ open, onClose, url, quote, author }: Props) {
+export default function ShareDialog({ open, onClose, url }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
 
@@ -55,7 +53,7 @@ export default function ShareDialog({ open, onClose, url, quote, author }: Props
         aria-label="共有"
       >
         <p className="text-sm font-medium text-ink mb-4">共有する</p>
-        <ShareActions url={url} quote={quote} author={author} />
+        <ShareActions url={url} />
         <div className="flex justify-end mt-5">
           <button
             ref={closeRef}

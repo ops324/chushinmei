@@ -28,12 +28,11 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function snsShareLinks(url: string, text: string) {
+export function snsShareLinks(url: string) {
   const u = encodeURIComponent(url)
-  const t = encodeURIComponent(text)
   return {
-    x: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
-    line: `https://social-plugins.line.me/lineit/share?url=${u}&text=${t}`,
+    x: `https://twitter.com/intent/tweet?url=${u}`,
+    line: `https://social-plugins.line.me/lineit/share?url=${u}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
   }
 }

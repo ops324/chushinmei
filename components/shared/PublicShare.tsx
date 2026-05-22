@@ -3,14 +3,9 @@
 import { useSyncExternalStore } from 'react'
 import ShareActions from '@/components/ui/ShareActions'
 
-type Props = {
-  quote: string
-  author: string
-}
-
 const noopSubscribe = () => () => {}
 
-export default function PublicShare({ quote, author }: Props) {
+export default function PublicShare() {
   const url = useSyncExternalStore(
     noopSubscribe,
     () => window.location.href,
@@ -22,7 +17,7 @@ export default function PublicShare({ quote, author }: Props) {
   return (
     <div className="mt-8 w-full max-w-lg">
       <p className="text-[10px] tracking-[0.3em] text-ink-faint mb-3 uppercase text-center">Share</p>
-      <ShareActions url={url} quote={quote} author={author} />
+      <ShareActions url={url} />
     </div>
   )
 }

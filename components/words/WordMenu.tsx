@@ -8,14 +8,12 @@ type Props = {
   wordId: string
   isPublic: boolean
   shareId: string | null
-  text: string
-  author: string
   onEdit: () => void
   onDelete: () => void
   showToast: (message: string, type?: 'success' | 'error') => void
 }
 
-export default function WordMenu({ wordId, isPublic, shareId, text, author, onEdit, onDelete, showToast }: Props) {
+export default function WordMenu({ wordId, isPublic, shareId, onEdit, onDelete, showToast }: Props) {
   const [open, setOpen] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
@@ -129,8 +127,6 @@ export default function WordMenu({ wordId, isPublic, shareId, text, author, onEd
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         url={shareUrl}
-        quote={text}
-        author={author}
       />
     </div>
   )

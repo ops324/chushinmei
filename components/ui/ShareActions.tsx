@@ -7,14 +7,12 @@ const noopSubscribe = () => () => {}
 
 type Props = {
   url: string
-  quote: string
-  author: string
 }
 
 const rowClass =
   'w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink rounded border border-border hover:border-border-strong hover:bg-bg-surface transition-colors text-left'
 
-export default function ShareActions({ url, quote, author }: Props) {
+export default function ShareActions({ url }: Props) {
   const [copied, setCopied] = useState(false)
   const canNativeShare = useSyncExternalStore(
     noopSubscribe,
@@ -22,8 +20,7 @@ export default function ShareActions({ url, quote, author }: Props) {
     () => false,
   )
 
-  const shareText = `「${quote}」${author ? ` — ${author}` : ''}`
-  const links = snsShareLinks(url, shareText)
+  const links = snsShareLinks(url)
 
   function openWindow(href: string) {
     window.open(href, '_blank', 'noopener,noreferrer')
@@ -31,7 +28,7 @@ export default function ShareActions({ url, quote, author }: Props) {
 
   async function handleNativeShare() {
     try {
-      await navigator.share({ title: '中心銘', text: shareText, url })
+      await navigator.share({ title: '中心銘', url })
     } catch {
       // ユーザーがキャンセルした場合などは無視
     }
