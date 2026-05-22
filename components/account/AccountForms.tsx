@@ -76,7 +76,7 @@ export function AvatarForm({ current, name }: { current: string | null; name: st
           className="text-sm text-ink-light file:mr-3 file:rounded file:border file:border-border file:bg-bg file:px-3 file:py-1.5 file:text-sm file:text-ink hover:file:border-border-strong file:cursor-pointer"
         />
       </div>
-      <p className="text-xs text-ink-faint leading-[1.7]">JPG / PNG / GIF など、2MB まで。正方形に切り抜かれて表示されます。</p>
+      <p className="text-xs text-ink-faint leading-[1.7]">JPG / PNG / GIF など、2MB まで。円形に切り抜かれて表示されます。</p>
       <div className="flex justify-end gap-3">
         {current && (
           <button
