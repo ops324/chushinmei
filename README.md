@@ -28,8 +28,9 @@
 |---------|------|
 | フロントエンド | Next.js 16（App Router）, React 19, TypeScript |
 | スタイリング | Tailwind CSS 4, Noto Serif JP（Google Fonts） |
-| バックエンド | Supabase（PostgreSQL + Auth + Row Level Security） |
+| バックエンド | Supabase（PostgreSQL + Auth + Storage + Row Level Security） |
 | 認証 | Supabase Auth（Email / Password） |
+| 画像クロップ | react-easy-crop（クライアント側で円形クロップ・ズーム） |
 | デプロイ | Vercel |
 
 ## 設計のポイント
@@ -40,6 +41,7 @@
 - **日付ベースのハッシュ** で「今日の言葉」を同一ユーザー・同一日には同じ結果に
 - **OGP メタデータ動的生成** で共有リンクの SNS プレビューに言葉と作者を表示
 - **アカウント管理** — ログアウト・設定への入口を右上メニューに集約（ヒューリスティック評価に基づく導線設計）。本人によるアカウント削除は `SECURITY DEFINER` 関数 `delete_own_account()` 経由で自分の行のみを削除し、`ON DELETE CASCADE` で言葉・プロフィールを連動削除
+- **プロフィール画像** — クライアント側でズーム・位置調整して円形に切り抜き、512px に縮小して Supabase Storage（`avatars` バケット）へアップロード。ストレージの RLS で「閲覧は公開／書き込みは本人フォルダ（`{uid}/...`）のみ」を保証し、`profiles.avatar_url` に公開 URL を保存（キャッシュ無効化のため `?v=` を付与）
 
 ## セットアップ
 
