@@ -24,13 +24,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const word = await getWord(shareId)
   if (!word) return { title: '中心銘' }
 
+  const title = `「${word.text.slice(0, 30)}」— 中心銘`
+  const description = word.author ? `— ${word.author}` : '中心銘より'
+
   return {
-    title: `「${word.text.slice(0, 30)}」— 中心銘`,
-    description: word.author ? `— ${word.author}` : '中心銘より',
+    title,
+    description,
     openGraph: {
       title: `「${word.text.slice(0, 30)}」`,
-      description: word.author ? `— ${word.author}` : '中心銘より',
+      description,
       siteName: '中心銘',
+      type: 'article',
+      locale: 'ja_JP',
+      images: ['/og.png'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `「${word.text.slice(0, 30)}」`,
+      description,
+      images: ['/og.png'],
     },
   }
 }
