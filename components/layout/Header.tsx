@@ -1,9 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
-import { logout } from '@/lib/actions/auth-actions'
+import Link from 'next/link'
+import AccountMenu from '@/components/layout/AccountMenu'
 
 export default async function Header() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  let displayName = ''
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    displayName = profile?.display_name ?? ''
+  }
 
   return (
     <header
@@ -11,17 +22,10 @@ export default async function Header() {
       style={{ borderTop: '3px solid var(--ai)' }}
     >
       <div className="max-w-2xl mx-auto w-full px-4 h-[52px] flex items-center justify-between">
-        <h1 className="text-sm font-semibold text-ink tracking-[0.22em]">中心銘</h1>
-        {user && (
-          <form action={logout}>
-            <button
-              type="submit"
-              className="text-xs text-ink-faint hover:text-ink-light transition-colors tracking-wide px-1 py-1"
-            >
-              ログアウト
-            </button>
-          </form>
-        )}
+        <Link href="/" className="text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors">
+          中心銘
+        </Link>
+        {user && <AccountMenu displayName={displayName} email={user.email ?? ''} />}
       </div>
     </header>
   )

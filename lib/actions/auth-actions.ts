@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 
 const CONNECTION_ERROR_MSG =
   'サーバーに接続できません。しばらく待ってから再度お試しください。（管理者: Supabaseプロジェクトの停止または環境変数をご確認ください）'
@@ -177,6 +178,88 @@ async function getOrigin(): Promise<string> {
 
 export async function logout() {
   const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/auth/login')
+}
+
+export async function updateDisplayName(
+  _prevState: { error?: string; success?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: string } | null> {
+  const displayName = ((formData.get('display_name') as string | null) ?? '').trim()
+  if (!displayName) return { error: '表示名を入力してください' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '認証されていません。再度ログインしてください' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({ id: user.id, display_name: displayName })
+  if (error) return { error: toUserMessage(error) }
+
+  revalidatePath('/account')
+  revalidatePath('/')
+  return { success: '表示名を更新しました' }
+}
+
+export async function updateEmail(
+  _prevState: { error?: string; success?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: string } | null> {
+  const email = ((formData.get('email') as string | null) ?? '').trim()
+  if (!email) return { error: 'メールアドレスを入力してください' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '認証されていません。再度ログインしてください' }
+  if (email === user.email) return { error: '現在のメールアドレスと同じです' }
+
+  const { error } = await supabase.auth.updateUser(
+    { email },
+    { emailRedirectTo: `${await getOrigin()}/auth/callback?next=/account` }
+  )
+  if (error) return { error: toUserMessage(error) }
+
+  return { success: `${email} に確認メールを送信しました。メール内のリンクをクリックすると変更が完了します。` }
+}
+
+export async function changePassword(
+  _prevState: { error?: string; success?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: string } | null> {
+  const currentPassword = formData.get('current_password') as string
+  const password = formData.get('password') as string
+  const passwordConfirm = formData.get('password_confirm') as string
+
+  if (!currentPassword || !password) return { error: 'パスワードを入力してください' }
+  if (password !== passwordConfirm) return { error: '新しいパスワードが一致しません' }
+  if (password.length < 6) return { error: 'パスワードは6文字以上で入力してください' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email) return { error: '認証されていません。再度ログインしてください' }
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+  if (verifyError) return { error: '現在のパスワードが正しくありません' }
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: toUserMessage(error) }
+
+  return { success: 'パスワードを変更しました' }
+}
+
+export async function deleteAccount(): Promise<{ error: string } | void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '認証されていません。再度ログインしてください' }
+
+  const { error } = await supabase.rpc('delete_own_account')
+  if (error) return { error: toUserMessage(error) }
+
   await supabase.auth.signOut()
   redirect('/auth/login')
 }
