@@ -2,7 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  // 下流（page/RSC）に渡すリクエストヘッダ。クライアントからの偽装を防ぐため
+  // x-user-* は proxy が必ず上書きするので、まず削除しておく。
+  const forwardedHeaders = new Headers(request.headers)
+  forwardedHeaders.delete('x-user-id')
+  forwardedHeaders.delete('x-user-email')
+
+  let supabaseResponse = NextResponse.next({ request: { headers: forwardedHeaders } })
 
   const { pathname } = request.nextUrl
 
@@ -23,7 +29,7 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          supabaseResponse = NextResponse.next({ request: { headers: forwardedHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -45,6 +51,11 @@ export async function proxy(request: NextRequest) {
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
+
+  // 検証済み user 情報を下流に渡す。これにより page/Header での重複 getUser() を省略できる。
+  forwardedHeaders.set('x-user-id', user.id)
+  if (user.email) forwardedHeaders.set('x-user-email', user.email)
+  supabaseResponse = NextResponse.next({ request: { headers: forwardedHeaders } })
 
   return supabaseResponse
 }

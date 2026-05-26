@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -41,19 +42,26 @@ function Section({
 }
 
 export default async function AccountPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
+  // proxy.ts で検証済みの user 情報をヘッダから取得（重複 getUser() を避ける）
+  const h = await headers()
+  const userId = h.get('x-user-id')
+  const email = h.get('x-user-email') ?? ''
+  if (!userId) redirect('/auth/login')
 
+  const supabase = await createClient()
   const { data: profile } = await supabase
     .from('profiles')
     .select('display_name, avatar_url')
-    .eq('id', user.id)
+    .eq('id', userId)
     .maybeSingle()
 
   return (
     <>
-      <Header />
+      <Header
+        displayName={profile?.display_name ?? ''}
+        email={email}
+        avatarUrl={profile?.avatar_url ?? null}
+      />
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         <div className="mb-6">
           <Link
@@ -70,7 +78,7 @@ export default async function AccountPage() {
 
         <div className="flex flex-col gap-5">
           <Section title="アイコン画像">
-            <AvatarForm current={profile?.avatar_url ?? null} name={profile?.display_name ?? (user.email ?? '')} />
+            <AvatarForm current={profile?.avatar_url ?? null} name={profile?.display_name ?? email} />
           </Section>
 
           <Section title="プロフィール">
@@ -78,7 +86,7 @@ export default async function AccountPage() {
           </Section>
 
           <Section title="メールアドレス">
-            <EmailForm current={user.email ?? ''} />
+            <EmailForm current={email} />
           </Section>
 
           <Section title="パスワード">

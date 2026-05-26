@@ -37,7 +37,8 @@
 
 - **Server Components / Server Actions** を中心に構成し、データ取得はサーバー、対話部分のみ Client Component に分離
 - **Row Level Security（RLS）** に加え、各 Server Action 内でも認証・所有者チェックを行う多層防御
-- **`proxy.ts`**（Next.js 16 で `middleware.ts` から改名された規約）でセッション更新と未認証リダイレクトを実装
+- **`proxy.ts`**（Next.js 16 で `middleware.ts` から改名された規約）でセッション更新と未認証リダイレクトを実装。検証済みの `user.id` / `email` をリクエストヘッダ（`x-user-id` / `x-user-email`）で下流に渡し、page・Header での重複 `getUser()` を排除
+- **初回表示の最適化** — トップページでは `words` と `profiles` を `Promise.all` で並列取得し、結果を Header に props で受け渡し（Header は同期 Server Component 化）。`app/loading.tsx` でスケルトンを即時表示し体感速度を向上
 - **日付ベースのハッシュ** で「今日の言葉」を同一ユーザー・同一日には同じ結果に
 - **OGP メタデータ動的生成** で共有リンクの SNS プレビューに言葉と作者を表示
 - **アカウント管理** — ログアウト・設定への入口を右上メニューに集約（ヒューリスティック評価に基づく導線設計）。本人によるアカウント削除は `SECURITY DEFINER` 関数 `delete_own_account()` 経由で自分の行のみを削除し、`ON DELETE CASCADE` で言葉・プロフィールを連動削除

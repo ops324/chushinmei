@@ -1,23 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import AccountMenu from '@/components/layout/AccountMenu'
 
-export default async function Header() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+type Props = {
+  displayName: string
+  email: string
+  avatarUrl: string | null
+}
 
-  let displayName = ''
-  let avatarUrl: string | null = null
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('display_name, avatar_url')
-      .eq('id', user.id)
-      .maybeSingle()
-    displayName = profile?.display_name ?? ''
-    avatarUrl = profile?.avatar_url ?? null
-  }
-
+export default function Header({ displayName, email, avatarUrl }: Props) {
   return (
     <header
       className="bg-bg-card border-b border-border sticky top-0 z-40"
@@ -29,7 +19,7 @@ export default async function Header() {
           中心銘
         </Link>
         <div className="justify-self-end">
-          {user && <AccountMenu displayName={displayName} email={user.email ?? ''} avatarUrl={avatarUrl} />}
+          {email && <AccountMenu displayName={displayName} email={email} avatarUrl={avatarUrl} />}
         </div>
       </div>
     </header>
