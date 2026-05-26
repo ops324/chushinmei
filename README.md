@@ -20,7 +20,7 @@
 - **OGP カード画像** — シェア時に SNS のプレビューへ和紙基調のブランドカード画像（`og:image` / Twitter `summary_large_image`）を表示し、`og:title` / `og:description` に言葉・出典を掲載
 - **アカウント設定** — 右上のアカウントメニューから設定ページ（`/account`）へ遷移し、表示名・メールアドレス・パスワードの変更、アカウント削除を操作可能。ログアウトはメニューに集約
 - **プロフィール画像** — アカウント設定からアイコン画像をアップロード・差し替え・削除（Supabase Storage の `avatars` バケットに保存）。アップロード時にズーム・位置を調整して円形に切り抜き可能（`react-easy-crop`）。未設定時は表示名の頭文字を表示
-- **楽観的 UI** — 削除を即座に反映し体感速度を向上
+- **楽観的 UI / 読み込みスケルトン** — 削除を即座に反映し体感速度を向上。サーバー応答待ちの間は `app/loading.tsx` のスケルトンを即時表示し、画面が真っ白になる時間をゼロに
 
 ## 技術スタック
 
@@ -119,6 +119,10 @@ npm run dev
 ## デプロイ
 
 [Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`）を設定するだけでデプロイできます。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのを忘れずに。
+
+### パフォーマンス計測（任意）
+
+Vercel ダッシュボードの **Speed Insights** を有効化すると、本番環境の Core Web Vitals（LCP / TTFB / CLS / INP）を継続的に計測できます。最適化の効果検証や、リージョン設定（必要なら Function Region を Supabase と同じリージョンに合わせる）の判断に有用です。
 
 ## 補足
 
