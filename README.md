@@ -36,7 +36,8 @@
 ## 設計のポイント
 
 - **Server Components / Server Actions** を中心に構成し、データ取得はサーバー、対話部分のみ Client Component に分離
-- **Row Level Security（RLS）** に加え、各 Server Action 内でも認証・所有者チェックを行う多層防御
+- **Row Level Security（RLS）** に加え、各 Server Action 内でも認証・所有者チェックを行う多層防御。DB 書き込みは戻り値の `error` を必ず検査し、失敗を握り潰さずユーザーへ通知
+- **入力バリデーション** — 言葉の文字数上限を純関数（`lib/utils/word-validation.ts`）に切り出してアプリ側で検証しつつ、DB の `CHECK` 制約でも同じ上限を担保。純関数は Vitest で単体テスト済み
 - **`proxy.ts`**（Next.js 16 で `middleware.ts` から改名された規約）でセッション更新と未認証リダイレクトを実装。検証済みの `user.id` / `email` をリクエストヘッダ（`x-user-id` / `x-user-email`）で下流に渡し、page・Header での重複 `getUser()` を排除
 - **初回表示の最適化** — トップページでは `words` と `profiles` を `Promise.all` で並列取得し、結果を Header に props で受け渡し（Header は同期 Server Component 化）。`app/loading.tsx` でスケルトンを即時表示し体感速度を向上
 - **日付ベースのハッシュ** で「今日の言葉」を同一ユーザー・同一日には同じ結果に
@@ -80,6 +81,8 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 
 > プロフィール画像機能には `profiles.avatar_url` 列と `avatars` ストレージバケット（＋RLS）が必要です。新規セットアップは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-avatar.sql`](supabase-migration-avatar.sql) を一度だけ実行してください。
 
+> 言葉の入力長制限（`text` 1〜2000 / `author` ≤200 / `memo` ≤2000 文字）は新規セットアップでは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-word-limits.sql`](supabase-migration-word-limits.sql) を一度だけ実行してください（アプリ側のバリデーションと同じ上限を DB でも担保する多層防御）。
+
 ### 5. パスワードリセット用メールテンプレートの設定
 
 パスワードリセットは PKCE の code_verifier がメールリンク経由で失われる問題を避けるため、**token_hash 方式**を採用しています。Supabase ダッシュボードで以下を設定してください。
@@ -115,6 +118,7 @@ npm run dev
 | `npm run build` | 本番ビルド |
 | `npm start` | 本番サーバー起動 |
 | `npm run lint` | ESLint（フラット設定 / `eslint-config-next`）。Next.js 16 で `next lint` は廃止されたため ESLint CLI を直接使用 |
+| `npm test` | Vitest による単体テスト（入力バリデーション・リダイレクト検証などの純関数） |
 
 ## デプロイ
 

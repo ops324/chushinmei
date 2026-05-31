@@ -3,21 +3,31 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { generateUniqueShareId } from '@/lib/utils/share-id'
+import { validateWord } from '@/lib/utils/word-validation'
+
+function parseWordForm(formData: FormData) {
+  const input = {
+    text: ((formData.get('text') as string | null) ?? '').trim(),
+    author: ((formData.get('author') as string | null) ?? '').trim(),
+    memo: ((formData.get('memo') as string | null) ?? '').trim(),
+  }
+  const error = validateWord(input)
+  if (error) throw new Error(error)
+  return input
+}
 
 export async function addWord(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const text = ((formData.get('text') as string | null) ?? '').trim()
-  if (!text) throw new Error('言葉は必須です')
+  const input = parseWordForm(formData)
 
-  await supabase.from('words').insert({
+  const { error } = await supabase.from('words').insert({
     user_id: user.id,
-    text,
-    author: (formData.get('author') as string | null)?.trim() ?? '',
-    memo: (formData.get('memo') as string | null)?.trim() ?? '',
+    ...input,
   })
+  if (error) throw new Error(error.message)
 
   revalidatePath('/')
 }
@@ -27,14 +37,13 @@ export async function updateWord(id: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const text = ((formData.get('text') as string | null) ?? '').trim()
-  if (!text) throw new Error('言葉は必須です')
+  const input = parseWordForm(formData)
 
-  await supabase.from('words').update({
-    text,
-    author: (formData.get('author') as string | null)?.trim() ?? '',
-    memo: (formData.get('memo') as string | null)?.trim() ?? '',
-  }).eq('id', id).eq('user_id', user.id)
+  const { error } = await supabase.from('words')
+    .update(input)
+    .eq('id', id)
+    .eq('user_id', user.id)
+  if (error) throw new Error(error.message)
 
   revalidatePath('/')
 }
@@ -44,7 +53,12 @@ export async function deleteWord(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  await supabase.from('words').delete().eq('id', id).eq('user_id', user.id)
+  const { error } = await supabase.from('words')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id)
+  if (error) throw new Error(error.message)
+
   revalidatePath('/')
 }
 
@@ -55,10 +69,11 @@ export async function toggleWordPublic(wordId: string, isPublic: boolean) {
 
   const shareId = isPublic ? await generateUniqueShareId(supabase) : null
 
-  await supabase.from('words')
+  const { error } = await supabase.from('words')
     .update({ is_public: isPublic, share_id: shareId })
     .eq('id', wordId)
     .eq('user_id', user.id)
+  if (error) throw new Error(error.message)
 
   revalidatePath('/')
   return shareId

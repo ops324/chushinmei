@@ -23,9 +23,9 @@ CREATE TABLE public.profiles (
 CREATE TABLE public.words (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  text       TEXT NOT NULL,
-  author     TEXT DEFAULT '',
-  memo       TEXT DEFAULT '',
+  text       TEXT NOT NULL CHECK (char_length(text) BETWEEN 1 AND 2000),
+  author     TEXT DEFAULT '' CHECK (char_length(author) <= 200),
+  memo       TEXT DEFAULT '' CHECK (char_length(memo) <= 2000),
   is_public  BOOLEAN DEFAULT false NOT NULL,
   share_id   TEXT UNIQUE,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL

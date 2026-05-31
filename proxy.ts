@@ -53,11 +53,14 @@ export async function proxy(request: NextRequest) {
   }
 
   // 検証済み user 情報を下流に渡す。これにより page/Header での重複 getUser() を省略できる。
+  // 新レスポンスを作り直す際、getUser() のトークン更新で supabaseResponse に積まれた
+  // Set-Cookie が失われないよう必ずコピーする（セッション早期切れの防止）。
   forwardedHeaders.set('x-user-id', user.id)
   if (user.email) forwardedHeaders.set('x-user-email', user.email)
-  supabaseResponse = NextResponse.next({ request: { headers: forwardedHeaders } })
+  const response = NextResponse.next({ request: { headers: forwardedHeaders } })
+  supabaseResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
 
-  return supabaseResponse
+  return response
 }
 
 export const config = {
