@@ -12,6 +12,48 @@ const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 export default function RegisterForm() {
   const [state, action, pending] = useActionState(register, null)
 
+  // 確認メール送信後は、フォームを案内パネルに差し替える（再送信防止）。
+  // このパネルは送信後＝クライアント描画時のみ表示されるため window 参照は安全。
+  if (state?.success) {
+    const fromTry =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('from') === 'try'
+    return (
+      <div className="bg-bg-card border border-border rounded-lg p-7 text-center">
+        <div className="flex justify-center mb-4">
+          <span
+            className="inline-flex items-center justify-center w-12 h-12 rounded-full"
+            style={{ background: 'var(--ai-muted)', color: 'var(--ai)' }}
+            aria-hidden
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-10 5L2 7" />
+            </svg>
+          </span>
+        </div>
+        <h2 className="text-base font-semibold text-ink mb-3">確認メールを送信しました</h2>
+        <p className="text-sm text-ink-light leading-[1.9]">{state.success}</p>
+        {fromTry && (
+          <p className="text-sm text-ink-light leading-[1.9] mt-2">
+            ログイン後、お試しで作成した言葉も引き継げます。
+          </p>
+        )}
+        <p className="text-xs text-ink-faint leading-[1.8] mt-4">
+          メールが届かない場合は、迷惑メールフォルダもご確認ください。
+        </p>
+        <div className="mt-6 pt-5 border-t border-border">
+          <p className="text-sm text-ink-faint">
+            確認が済んだら{' '}
+            <Link href="/auth/login" className="text-ai font-medium hover:underline underline-offset-4">
+              ログイン
+            </Link>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-bg-card border border-border rounded-lg p-7">
       <form action={action} className="flex flex-col gap-4">

@@ -66,9 +66,9 @@ export async function login(
 }
 
 export async function register(
-  _prevState: { error: string } | null,
+  _prevState: { error?: string; success?: string } | null,
   formData: FormData
-): Promise<{ error: string } | null> {
+): Promise<{ error?: string; success?: string } | null> {
   let supabase
   try {
     supabase = await createClient()
@@ -76,10 +76,12 @@ export async function register(
     return { error: toUserMessage({ message: String(e) }) }
   }
 
+  const email = formData.get('email') as string
+
   let result
   try {
     result = await supabase.auth.signUp({
-      email: formData.get('email') as string,
+      email,
       password: formData.get('password') as string,
       options: {
         data: { full_name: formData.get('display_name') as string },
@@ -90,6 +92,15 @@ export async function register(
   }
 
   if (result.error) return { error: toUserMessage(result.error) }
+
+  // メール確認ON環境では signUp 時点でセッションが張られない。その場合トップへ飛ばすと
+  // proxy で /auth/login に弾かれ、ユーザーは無言でログイン画面に戻されてしまう。
+  // セッションが無ければリダイレクトせず、確認メールの案内を表示する。
+  if (!result.data.session) {
+    return {
+      success: `「中心銘」から ${email} に確認メールを送信しました。メール内のリンクをクリックすると登録が完了します。`,
+    }
+  }
   redirect('/')
 }
 
