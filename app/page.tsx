@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import WordsClient from '@/components/words/WordsClient'
+import TryMigrationPrompt from '@/components/words/TryMigrationPrompt'
 
 export default async function Home() {
   // proxy.ts で検証済みの user 情報をヘッダから取得する。
@@ -36,6 +37,7 @@ export default async function Home() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         <WordsClient initialWords={wordsRes.data ?? []} />
       </main>
+      <TryMigrationPrompt />
     </>
   )
 }

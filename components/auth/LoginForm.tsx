@@ -87,6 +87,11 @@ export default function LoginForm() {
             登録
           </Link>
         </p>
+        <p className="text-sm text-ink-faint pt-1">
+          <Link href="/try" className="text-ai font-medium hover:underline underline-offset-4">
+            まずはお試しで体験する
+          </Link>
+        </p>
       </div>
     </div>
   )

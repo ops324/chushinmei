@@ -62,6 +62,27 @@ export async function deleteWord(id: string) {
   revalidatePath('/')
 }
 
+export async function bulkAddWords(
+  inputs: { text: string; author: string; memo: string }[]
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  const rows = inputs
+    .slice(0, 50) // 上限で誤爆/DoS防止
+    .map(i => ({ text: i.text.trim(), author: i.author.trim(), memo: i.memo.trim() }))
+    .filter(i => !validateWord(i)) // 不正な入力は取り込まない
+    .map(i => ({ user_id: user.id, ...i }))
+  if (rows.length === 0) return { inserted: 0 }
+
+  const { error } = await supabase.from('words').insert(rows)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/')
+  return { inserted: rows.length }
+}
+
 export async function toggleWordPublic(wordId: string, isPublic: boolean) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
