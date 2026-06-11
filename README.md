@@ -85,20 +85,37 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 
 > 言葉の入力長制限（`text` 1〜2000 / `author` ≤200 / `memo` ≤2000 文字）は新規セットアップでは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-word-limits.sql`](supabase-migration-word-limits.sql) を一度だけ実行してください（アプリ側のバリデーションと同じ上限を DB でも担保する多層防御）。
 
-### 5. パスワードリセット用メールテンプレートの設定
+### 5. メールテンプレート・送信者（SMTP）の設定
 
-パスワードリセットは PKCE の code_verifier がメールリンク経由で失われる問題を避けるため、**token_hash 方式**を採用しています。Supabase ダッシュボードで以下を設定してください。
+認証メール（パスワードリセット・新規登録の確認）は、PKCE の code_verifier がメールリンク経由で失われる問題を避けるため、いずれも **token_hash 方式**を採用しています。Supabase ダッシュボードで以下を設定してください。
 
-- `Authentication > URL Configuration`
-  - **Site URL**: 開発時は `http://localhost:3000`、本番はデプロイ先 URL
-  - **Redirect URLs**: `http://localhost:3000/**` および本番 URL の `/**` を許可
-- `Authentication > Email Templates > Reset Password` のリンクを次の形式に変更
+#### URL 設定（`Authentication > URL Configuration`）
+- **Site URL**: 開発時は `http://localhost:3000`、本番はデプロイ先 URL（確認リンクの既定の戻り先になります）
+- **Redirect URLs**: `http://localhost:3000/auth/callback` および本番 URL の `/auth/callback`（`/**` での許可も可）
+
+#### メールテンプレート（`Authentication > Email Templates`）
+- **Reset Password** のリンクを次の形式に変更
 
   ```html
   <a href="{{ .SiteURL }}/auth/update-password?token_hash={{ .TokenHash }}&type=recovery">
     パスワードを再設定する
   </a>
   ```
+
+- **Confirm signup**（新規登録の確認）のリンクを次の形式に変更。デフォルトの `{{ .ConfirmationURL }}` は code 方式のため、別ブラウザ／スマホでリンクを開くとセッションが張れず `/auth/login` に弾かれます。`token_hash` 方式にすると `app/auth/callback/route.ts` が `verifyOtp` で検証し、そのままログインできます
+
+  ```html
+  <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email">
+    メールアドレスを確認する
+  </a>
+  ```
+
+  > `type=email` で確認できない環境では `type=signup` を使用します（コールバックは URL の `type` をそのまま `verifyOtp` に渡すため、テンプレート側の変更だけで切り替え可能）。
+
+#### 送信者名・差出人（任意：Custom SMTP）
+差出人を「中心銘」にするには `Authentication > Emails > SMTP Settings` で Custom SMTP を有効化します（組み込みメールは差出人名を変更できず、送信上限も低いため本番非推奨）。
+- **Sender name**: `中心銘` / **Sender email**: 認証済みのアドレス
+- 独自ドメインがあれば Resend / SendGrid / Amazon SES を、無ければ Gmail（`smtp.gmail.com` / Port `465` / Username＝Gmail アドレス / Password＝Google の「アプリパスワード」）でも可。Gmail を使う場合、Sender email・Username・アプリパスワードはすべて**同一の Google アカウント**に揃える必要があります。
 
 ### 6. （任意）デモデータの投入
 
