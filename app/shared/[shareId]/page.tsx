@@ -8,15 +8,16 @@ type Props = {
   params: Promise<{ shareId: string }>
 }
 
-async function getWord(shareId: string) {
+type SharedWord = { text: string; author: string; created_at: string }
+
+async function getWord(shareId: string): Promise<SharedWord | null> {
   const supabase = await createClient()
+  // anon にテーブル直アクセスを与えず、share_id 指定で1行だけ返す RPC 経由で取得する
+  // （is_public=true の全件列挙を防ぐため）。
   const { data } = await supabase
-    .from('words')
-    .select('text, author, created_at')
-    .eq('share_id', shareId)
-    .eq('is_public', true)
-    .single()
-  return data
+    .rpc('get_shared_word', { p_share_id: shareId })
+    .maybeSingle()
+  return (data as SharedWord | null) ?? null
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -45,11 +45,15 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
-  // 未認証はログインへリダイレクト
+  // 未認証はログインへリダイレクト。getUser() のトークン更新で supabaseResponse に
+  // 積まれた Set-Cookie をリダイレクト応答にも引き継ぐ（認証済み経路と同様）。
+  // コピーしないとセッション更新が失われ、再ログインのループを招く恐れがある。
   if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie))
+    return redirectResponse
   }
 
   // 検証済み user 情報を下流に渡す。これにより page/Header での重複 getUser() を省略できる。

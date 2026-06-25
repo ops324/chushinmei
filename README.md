@@ -87,6 +87,8 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 
 > 言葉の入力長制限（`text` 1〜2000 / `author` ≤200 / `memo` ≤2000 文字）は新規セットアップでは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-word-limits.sql`](supabase-migration-word-limits.sql) を一度だけ実行してください（アプリ側のバリデーションと同じ上限を DB でも担保する多層防御）。
 
+> 共有ページの公開言葉取得は `get_shared_word()` 関数（`share_id` 指定で1行のみ返す）経由に限定しています。これは未認証ユーザーが Data API で `is_public=true` の言葉を**全件列挙**できてしまう問題を防ぐためで、`anon` ロールには `words` テーブルへの直接 SELECT を与えていません。新規セットアップは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-share-rpc.sql`](supabase-migration-share-rpc.sql) を一度だけ実行してください。
+
 ### 5. メールテンプレート・送信者（SMTP）の設定
 
 認証メール（パスワードリセット・新規登録の確認）は、PKCE の code_verifier がメールリンク経由で失われる問題を避けるため、いずれも **token_hash 方式**を採用しています。Supabase ダッシュボードで以下を設定してください。
