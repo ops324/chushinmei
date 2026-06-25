@@ -278,6 +278,10 @@ export async function deleteAccount(): Promise<{ error: string } | void> {
 }
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024
+// SVG（image/svg+xml）は実行可能マークアップを含められ、avatars は公開バケットのため
+// 直リンクでスクリプトが評価される恐れがある。ラスタ画像のみをホワイトリストで許可する。
+// （クライアントのクロップは常に image/jpeg を出力する。）
+const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
 export async function updateAvatar(
   _prevState: { error?: string; success?: string } | null,
@@ -285,7 +289,9 @@ export async function updateAvatar(
 ): Promise<{ error?: string; success?: string } | null> {
   const file = formData.get('avatar') as File | null
   if (!file || file.size === 0) return { error: '画像を選択してください' }
-  if (!file.type.startsWith('image/')) return { error: '画像ファイルを選択してください' }
+  if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+    return { error: 'JPEG / PNG / WebP / GIF の画像を選択してください' }
+  }
   if (file.size > MAX_AVATAR_BYTES) return { error: '画像は2MB以下にしてください' }
 
   const supabase = await createClient()
