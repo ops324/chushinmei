@@ -146,6 +146,15 @@ npm run dev
 | `npm start` | 本番サーバー起動 |
 | `npm run lint` | ESLint（フラット設定 / `eslint-config-next`）。Next.js 16 で `next lint` は廃止されたため ESLint CLI を直接使用 |
 | `npm test` | Vitest による単体テスト（入力バリデーション・リダイレクト検証などの純関数） |
+| `npm run typecheck` | `tsc --noEmit` による型チェック |
+| `npm run test:e2e` | Playwright による E2E スモークテスト（公開ページのレンダリング・ルーティング） |
+
+## テスト・CI・モニタリング
+
+- **単体テスト（Vitest）** — 純関数（`lib/utils/*.test.ts`）を対象。
+- **E2E スモークテスト（Playwright）** — `e2e/` に配置。ログイン／登録／パスワードリセット／お試しページのレンダリングと、未認証時のトップ→ログインのリダイレクトを検証します。認証・DB を必要としないため、Supabase の値はダミーでも実行できます（`npm run test:e2e`、初回は `npx playwright install chromium` が必要）。認証フローの本格的な E2E はテスト用 Supabase プロジェクトを用意して拡張してください。
+- **CI（GitHub Actions）** — `.github/workflows/ci.yml` で PR 時に lint / typecheck / 単体テスト / build / E2E を自動実行します。
+- **エラーモニタリング（Sentry・任意）** — `@sentry/nextjs` を導入済み。`NEXT_PUBLIC_SENTRY_DSN` を設定すると本番のクライアント／サーバーエラーを Sentry に送信します（未設定時は完全に無効で、ビルド・実行に一切影響しません）。ソースマップを Sentry にアップロードする場合のみ `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` を設定してください。
 
 ## デプロイ
 

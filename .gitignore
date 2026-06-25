@@ -13,6 +13,16 @@
 # testing
 /coverage
 
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# sentry
+.sentryclirc
+.env.sentry-build-plugin
+
 # next.js
 /.next/
 /out/
