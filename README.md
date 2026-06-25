@@ -73,7 +73,11 @@ cp .env.local.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
+# 本番のみ必須。確認メール/リセットリンクの生成に使う信頼できるサイトURL（末尾スラッシュなし）
+NEXT_PUBLIC_SITE_URL=https://your-production-domain
 ```
+
+> `NEXT_PUBLIC_SITE_URL` は確認メールやパスワードリセットのリンクの起点になります。以前はリクエストの `Host` ヘッダから生成していましたが、偽装によりリンクが攻撃者ドメインに向く恐れがあったため、信頼できる環境変数に固定しました。ローカル開発では未設定で `http://localhost:3000` にフォールバックします。**本番でこの変数が未設定だとパスワードリセット等が実行時エラーになります。**
 
 ### 4. データベーススキーマの適用
 
@@ -93,7 +97,7 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 
 #### URL 設定（`Authentication > URL Configuration`）
 - **Site URL**: 開発時は `http://localhost:3000`、本番はデプロイ先 URL（確認リンクの既定の戻り先になります）
-- **Redirect URLs**: `http://localhost:3000/auth/callback` および本番 URL の `/auth/callback`（`/**` での許可も可）
+- **Redirect URLs**: `http://localhost:3000/auth/callback` および本番 URL の `/auth/callback`。**セキュリティ上、`/**` のワイルドカードは避け、利用するURLを確定で列挙することを推奨します**（万一リンクが汚染されても許可外のドメインへは飛ばさないための多層防御）
 
 #### メールテンプレート（`Authentication > Email Templates`）
 - **Reset Password** のリンクを次の形式に変更
@@ -143,7 +147,7 @@ npm run dev
 
 ## デプロイ
 
-[Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`）を設定するだけでデプロイできます。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのを忘れずに。
+[Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `NEXT_PUBLIC_SITE_URL`）を設定するだけでデプロイできます。`NEXT_PUBLIC_SITE_URL` には本番ドメイン（例: `https://chushinmei.example.com`）を設定してください。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのも忘れずに。
 
 ### パフォーマンス計測（任意）
 

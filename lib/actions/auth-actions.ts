@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
 const CONNECTION_ERROR_MSG =
@@ -107,10 +106,7 @@ export async function register(
 // Google OAuth は現在UIを非表示にしているため未使用だが、再有効化時に使うため残している
 export async function loginWithGoogle() {
   const supabase = await createClient()
-  const headersList = await headers()
-  const host = headersList.get('host')
-  const protocol = host?.includes('localhost') ? 'http' : 'https'
-  const redirectTo = `${protocol}://${host}/auth/callback`
+  const redirectTo = `${getSiteUrl()}/auth/callback`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -136,7 +132,7 @@ export async function resetPassword(
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${await getOrigin()}/auth/callback?next=/auth/update-password`,
+      redirectTo: `${getSiteUrl()}/auth/callback?next=/auth/update-password`,
     })
     if (error) return { error: toUserMessage(error) }
   } catch (e) {
@@ -180,11 +176,17 @@ export async function updatePassword(
   redirect('/')
 }
 
-async function getOrigin(): Promise<string> {
-  const headersList = await headers()
-  const host = headersList.get('host')
-  const protocol = host?.includes('localhost') ? 'http' : 'https'
-  return `${protocol}://${host}`
+// 確認メール等のリダイレクトURLの起点。リクエスト由来の Host ヘッダは攻撃者が
+// 偽装でき、リセット/メール変更リンクを攻撃者ドメインに向けて token_hash を奪取
+// される恐れがあるため使わない。信頼できる NEXT_PUBLIC_SITE_URL のみを真実とする。
+function getSiteUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+  if (url) return url.replace(/\/+$/, '')
+  if (process.env.NODE_ENV !== 'production') return 'http://localhost:3000'
+  // 本番で未設定は設定漏れ。Host へフォールバックさせず明示的に失敗させる。
+  throw new Error(
+    'NEXT_PUBLIC_SITE_URL が未設定です。本番環境では信頼できるサイトURL（例: https://example.com）の設定が必須です。'
+  )
 }
 
 export async function logout() {
@@ -228,7 +230,7 @@ export async function updateEmail(
 
   const { error } = await supabase.auth.updateUser(
     { email },
-    { emailRedirectTo: `${await getOrigin()}/auth/callback?next=/account` }
+    { emailRedirectTo: `${getSiteUrl()}/auth/callback?next=/account` }
   )
   if (error) return { error: toUserMessage(error) }
 
