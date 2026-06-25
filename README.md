@@ -33,12 +33,19 @@
 | バックエンド | Supabase（PostgreSQL + Auth + Storage + Row Level Security） |
 | 認証 | Supabase Auth（Email / Password） |
 | 画像クロップ | react-easy-crop（クライアント側で円形クロップ・ズーム） |
+| テスト | Vitest（単体）, Playwright（E2E スモーク） |
+| CI / 監視 | GitHub Actions（lint / typecheck / test / build / E2E）, Sentry（任意・エラーモニタリング） |
 | デプロイ | Vercel |
 
 ## 設計のポイント
 
 - **Server Components / Server Actions** を中心に構成し、データ取得はサーバー、対話部分のみ Client Component に分離
 - **Row Level Security（RLS）** に加え、各 Server Action 内でも認証・所有者チェックを行う多層防御。DB 書き込みは戻り値の `error` を必ず検査し、失敗を握り潰さずユーザーへ通知
+- **セキュリティ・ハードニング** — 商用運用に向けて以下を実施。
+  - **確認メール／リセットリンクの起点を固定** — リダイレクト URL を信頼できる `NEXT_PUBLIC_SITE_URL` から生成し、偽装可能な `Host` ヘッダに依存しない（リンク汚染による `token_hash` 奪取の防止）。
+  - **公開言葉の列挙防止** — 匿名ユーザーには `words` テーブルへの直接 SELECT を与えず、`share_id` 指定で1行だけ返す `SECURITY DEFINER` 関数 `get_shared_word()` 経由に限定（`/shared/[shareId]`）。`is_public=true` の全件列挙を遮断。
+  - **アバター画像の MIME ホワイトリスト** — 公開バケットでの Stored XSS を防ぐため、`image/svg+xml` 等を排除しラスタ画像（JPEG / PNG / WebP / GIF）のみ許可。
+  - **セッション Cookie の確実な引き継ぎ** — `proxy.ts` の未認証リダイレクトでもトークン更新 Cookie をレスポンスへコピーし、セッション早期切れを防止。
 - **入力バリデーション** — 言葉の文字数上限を純関数（`lib/utils/word-validation.ts`）に切り出してアプリ側で検証しつつ、DB の `CHECK` 制約でも同じ上限を担保。純関数は Vitest で単体テスト済み
 - **`proxy.ts`**（Next.js 16 で `middleware.ts` から改名された規約）でセッション更新と未認証リダイレクトを実装。検証済みの `user.id` / `email` をリクエストヘッダ（`x-user-id` / `x-user-email`）で下流に渡し、page・Header での重複 `getUser()` を排除
 - **初回表示の最適化** — トップページでは `words` と `profiles` を `Promise.all` で並列取得し、結果を Header に props で受け渡し（Header は同期 Server Component 化）。`app/loading.tsx` でスケルトンを即時表示し体感速度を向上
