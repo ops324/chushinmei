@@ -73,7 +73,11 @@ cp .env.local.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
+# 本番のみ必須。確認メール/リセットリンクの生成に使う信頼できるサイトURL（末尾スラッシュなし）
+NEXT_PUBLIC_SITE_URL=https://your-production-domain
 ```
+
+> `NEXT_PUBLIC_SITE_URL` は確認メールやパスワードリセットのリンクの起点になります。以前はリクエストの `Host` ヘッダから生成していましたが、偽装によりリンクが攻撃者ドメインに向く恐れがあったため、信頼できる環境変数に固定しました。ローカル開発では未設定で `http://localhost:3000` にフォールバックします。**本番でこの変数が未設定だとパスワードリセット等が実行時エラーになります。**
 
 ### 4. データベーススキーマの適用
 
@@ -87,13 +91,15 @@ Supabase ダッシュボードの `SQL Editor` で [`supabase-schema.sql`](supab
 
 > 言葉の入力長制限（`text` 1〜2000 / `author` ≤200 / `memo` ≤2000 文字）は新規セットアップでは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-word-limits.sql`](supabase-migration-word-limits.sql) を一度だけ実行してください（アプリ側のバリデーションと同じ上限を DB でも担保する多層防御）。
 
+> 共有ページの公開言葉取得は `get_shared_word()` 関数（`share_id` 指定で1行のみ返す）経由に限定しています。これは未認証ユーザーが Data API で `is_public=true` の言葉を**全件列挙**できてしまう問題を防ぐためで、`anon` ロールには `words` テーブルへの直接 SELECT を与えていません。新規セットアップは `supabase-schema.sql` に含まれます。既存プロジェクトには [`supabase-migration-share-rpc.sql`](supabase-migration-share-rpc.sql) を一度だけ実行してください。
+
 ### 5. メールテンプレート・送信者（SMTP）の設定
 
 認証メール（パスワードリセット・新規登録の確認）は、PKCE の code_verifier がメールリンク経由で失われる問題を避けるため、いずれも **token_hash 方式**を採用しています。Supabase ダッシュボードで以下を設定してください。
 
 #### URL 設定（`Authentication > URL Configuration`）
 - **Site URL**: 開発時は `http://localhost:3000`、本番はデプロイ先 URL（確認リンクの既定の戻り先になります）
-- **Redirect URLs**: `http://localhost:3000/auth/callback` および本番 URL の `/auth/callback`（`/**` での許可も可）
+- **Redirect URLs**: `http://localhost:3000/auth/callback` および本番 URL の `/auth/callback`。**セキュリティ上、`/**` のワイルドカードは避け、利用するURLを確定で列挙することを推奨します**（万一リンクが汚染されても許可外のドメインへは飛ばさないための多層防御）
 
 #### メールテンプレート（`Authentication > Email Templates`）
 - **Reset Password** のリンクを次の形式に変更
@@ -152,7 +158,7 @@ npm run dev
 
 ## デプロイ
 
-[Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`）を設定するだけでデプロイできます。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのを忘れずに。
+[Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `NEXT_PUBLIC_SITE_URL`）を設定するだけでデプロイできます。`NEXT_PUBLIC_SITE_URL` には本番ドメイン（例: `https://chushinmei.example.com`）を設定してください。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのも忘れずに。
 
 ### パフォーマンス計測（任意）
 

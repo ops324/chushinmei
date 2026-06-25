@@ -32,8 +32,9 @@ CREATE TABLE public.words (
 );
 
 -- Data API アクセス権付与（PostgREST / supabase-js 用）
--- words: 未ログインユーザーは公開言葉のみSELECT可、ログイン済みユーザーはCRUD可
-GRANT SELECT                       ON public.words    TO anon;
+-- words: ログイン済みユーザーは自分の言葉をCRUD可。未ログインユーザーには
+-- テーブル直アクセスを与えず、共有は get_shared_word() RPC（後述）経由に限定する
+-- （anon に SELECT を与えると is_public=true の全件を列挙できてしまうため）。
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.words  TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.words  TO service_role;
 
@@ -45,12 +46,28 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
 ALTER TABLE public.words    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- words のRLSポリシー
+-- words のRLSポリシー（自分の言葉のみCRUD可）
+-- 公開言葉の閲覧は anon への直SELECTを与えず、get_shared_word() RPC で
+-- share_id 指定の1行のみ返す方式に限定する（全件列挙の防止）。
 CREATE POLICY "own_words_all" ON public.words
   FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "public_words_select" ON public.words
-  FOR SELECT USING (is_public = true);
+-- share_id 指定で公開言葉を1行だけ返す関数（未認証でも閲覧可だが列挙不可）
+CREATE OR REPLACE FUNCTION public.get_shared_word(p_share_id text)
+RETURNS TABLE (text text, author text, created_at timestamptz)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT w.text, w.author, w.created_at
+  FROM public.words w
+  WHERE w.share_id = p_share_id
+    AND w.is_public = true
+  LIMIT 1;
+$$;
+
+REVOKE ALL     ON FUNCTION public.get_shared_word(text) FROM public;
+GRANT  EXECUTE ON FUNCTION public.get_shared_word(text) TO anon, authenticated;
 
 -- profiles のRLSポリシー
 CREATE POLICY "own_profile_all" ON public.profiles
