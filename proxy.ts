@@ -14,8 +14,9 @@ export async function proxy(request: NextRequest) {
 
   // パブリックパス（認証不要かつセッション不要）— Supabaseへの接続を省略
   // /auth/callback と /auth/update-password はセッション処理が必要なので除外
+  // /api/health はキープアライブ兼ヘルスチェック（未認証で到達可能である必要がある）
   const authNeedsSession = pathname === '/auth/callback' || pathname === '/auth/update-password'
-  if ((pathname.startsWith('/auth') && !authNeedsSession) || pathname.startsWith('/shared') || pathname.startsWith('/try')) {
+  if ((pathname.startsWith('/auth') && !authNeedsSession) || pathname.startsWith('/shared') || pathname.startsWith('/try') || pathname.startsWith('/api/health')) {
     return supabaseResponse
   }
 

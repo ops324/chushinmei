@@ -161,11 +161,27 @@ npm run dev
 - **単体テスト（Vitest）** — 純関数（`lib/utils/*.test.ts`）を対象。
 - **E2E スモークテスト（Playwright）** — `e2e/` に配置。ログイン／登録／パスワードリセット／お試しページのレンダリングと、未認証時のトップ→ログインのリダイレクトを検証します。認証・DB を必要としないため、Supabase の値はダミーでも実行できます（`npm run test:e2e`、初回は `npx playwright install chromium` が必要）。認証フローの本格的な E2E はテスト用 Supabase プロジェクトを用意して拡張してください。
 - **CI（GitHub Actions）** — `.github/workflows/ci.yml` で PR 時に lint / typecheck / 単体テスト / build / E2E を自動実行します。
+- **ヘルスチェック / キープアライブ** — `GET /api/health` はアプリ→Supabase の接続を確認するエンドポイントで、成功時 `{"status":"ok","db":"ok",...}`（HTTP 200）、DB 到達不可時は HTTP 503 を返します（キー等の詳細は返しません）。匿名で叩けるよう `proxy.ts` の公開パスに含めており、DB へは anon で実行できる唯一のクエリである `get_shared_word()` RPC を1回投げます。`.github/workflows/keepalive.yml` がこのエンドポイントを **3日ごと**（`workflow_dispatch` で手動実行も可）に叩き、Supabase フリープランの「7日間非アクティブで自動一時停止」を防ぎます。詳細は後述の[「Supabase の自動一時停止を防ぐ」](#supabase-の自動一時停止を防ぐキープアライブ)を参照。
 - **エラーモニタリング（Sentry・任意）** — `@sentry/nextjs` を導入済み。`NEXT_PUBLIC_SENTRY_DSN` を設定すると本番のクライアント／サーバーエラーを Sentry に送信します（未設定時は完全に無効で、ビルド・実行に一切影響しません）。ソースマップを Sentry にアップロードする場合のみ `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` を設定してください。
 
 ## デプロイ
 
 [Vercel](https://vercel.com) にインポートし、環境変数（`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `NEXT_PUBLIC_SITE_URL`）を設定するだけでデプロイできます。`NEXT_PUBLIC_SITE_URL` には本番ドメイン（例: `https://chushinmei.example.com`）を設定してください。Supabase 側の Site URL / Redirect URLs に本番 URL を追加するのも忘れずに。
+
+### Supabase の自動一時停止を防ぐ（キープアライブ）
+
+Supabase のフリープランは **7日間アクティビティがない**とプロジェクトを自動で一時停止します（復旧はダッシュボードの「Restore project」ボタンで手動）。これを防ぐため、`.github/workflows/keepalive.yml` が本番の `GET /api/health` を **3日ごと**に叩き、実際に DB へ軽量クエリ（`get_shared_word()` RPC）を投げます。ヘルスチェックと停止防止を1本で兼ねる構成です。
+
+セットアップ（**リポジトリ変数の登録が必要**）:
+
+1. GitHub リポジトリの **Settings → Secrets and variables → Actions → Variables** で、リポジトリ変数 `PRODUCTION_URL` に本番 URL（末尾スラッシュなし、例 `https://chushinmei.example.com`）を登録する。
+2. `Actions` タブから `supabase-keepalive` を `Run workflow`（手動）で実行し、ジョブが成功（`/api/health` が 200 / `db:ok`）することを確認する。
+
+補足:
+
+- **60日自動無効化の回避** — GitHub はデフォルトブランチが60日間更新されないとスケジュール実行を自動で無効化します。これを避けるため、workflow は毎回 `.github/keepalive.txt` にタイムスタンプを書いて `[skip ci]` 付きの bot コミットを `main` に積みます（`GITHUB_TOKEN` の push は他 workflow を再トリガーしないため、既存 `ci.yml` は発火しません）。
+- **頻度の根拠** — cron が高負荷時に遅延・スキップされても、3日間隔なら1回落ちても6日で、7日の停止まで余裕が残ります。
+- `main` に直 push 禁止のブランチ保護をかける場合は、`github-actions[bot]` に保護のバイパスを許可してください（未設定なら不要）。
 
 ### パフォーマンス計測（任意）
 

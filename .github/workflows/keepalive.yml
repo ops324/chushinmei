@@ -1,0 +1,45 @@
+name: supabase-keepalive
+
+# Supabase フリープランは「7日間非アクティブ」でプロジェクトを自動一時停止する。
+# 3日おきに本番の /api/health を叩き、実際に DB へ軽量クエリを投げて停止を防ぐ。
+# 同時にアプリ→DB の接続が正常かも確認する（失敗すれば Actions が落ちて通知が飛ぶ）。
+on:
+  schedule:
+    # 3日ごと 03:00 UTC。cron が1回スキップ/遅延しても6日で、7日の停止まで余裕が残る。
+    - cron: '0 3 */3 * *'
+  workflow_dispatch: {}
+
+# 下の「リポジトリ活動維持」コミットを push するために必要（最小限）。
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ping health endpoint
+        run: |
+          if [ -z "${{ vars.PRODUCTION_URL }}" ]; then
+            echo "::error::リポジトリ変数 PRODUCTION_URL が未設定です（Settings > Secrets and variables > Actions > Variables）"
+            exit 1
+          fi
+          code=$(curl -sS -o body.txt -w '%{http_code}' "${{ vars.PRODUCTION_URL }}/api/health")
+          echo "HTTP $code"
+          cat body.txt
+          test "$code" = "200"
+          grep -q '"db":"ok"' body.txt
+
+      # GitHub は「デフォルトブランチが60日間更新されない」とスケジュール実行を自動無効化する。
+      # 専用ファイルにタイムスタンプを書いて bot コミットを積み、リポジトリ活動を維持する。
+      # コミットメッセージの [skip ci] で既存 ci.yml を発火させない
+      # （GITHUB_TOKEN による push はそもそも他 workflow を再トリガーしないため二重に安全）。
+      - name: Keep repo active (avoid 60-day disable)
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/keepalive.txt
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive.txt
+          git commit -m "chore: keepalive [skip ci]" || exit 0
+          git push
