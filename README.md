@@ -161,7 +161,7 @@ npm run dev
 - **単体テスト（Vitest）** — 純関数（`lib/utils/*.test.ts`）を対象。
 - **E2E スモークテスト（Playwright）** — `e2e/` に配置。ログイン／登録／パスワードリセット／お試しページのレンダリングと、未認証時のトップ→ログインのリダイレクトを検証します。認証・DB を必要としないため、Supabase の値はダミーでも実行できます（`npm run test:e2e`、初回は `npx playwright install chromium` が必要）。認証フローの本格的な E2E はテスト用 Supabase プロジェクトを用意して拡張してください。
 - **CI（GitHub Actions）** — `.github/workflows/ci.yml` で PR 時に lint / typecheck / 単体テスト / build / E2E を自動実行します。
-- **ヘルスチェック / キープアライブ** — `GET /api/health` はアプリ→Supabase の接続を確認するエンドポイントで、成功時 `{"status":"ok","db":"ok",...}`（HTTP 200）、DB 到達不可時は HTTP 503 を返します（キー等の詳細は返しません）。匿名で叩けるよう `proxy.ts` の公開パスに含めており、DB へは anon で実行できる唯一のクエリである `get_shared_word()` RPC を1回投げます。`vercel.json` の **Vercel Cron** がこのエンドポイントを **1日1回**自動で叩き、Supabase フリープランの「7日間非アクティブで自動一時停止」を防ぎます。詳細は後述の[「Supabase の自動一時停止を防ぐ」](#supabase-の自動一時停止を防ぐキープアライブ)を参照。
+- **ヘルスチェック / キープアライブ** — `GET /api/health` はアプリ→Supabase の接続を確認するエンドポイントで、成功時 `{"status":"ok","db":"ok",...}`（HTTP 200）、DB 到達不可時は HTTP 503、`CRON_SECRET` 設定時に認証ヘッダが不正なら HTTP 401 を返します（キー等の詳細は返しません）。匿名で叩けるよう `proxy.ts` の公開パスに含めており、DB へは anon で実行できる唯一のクエリである `get_shared_word()` RPC を1回投げます。`vercel.json` の **Vercel Cron** がこのエンドポイントを **1日1回**自動で叩き、Supabase フリープランの「7日間非アクティブで自動一時停止」を防ぎます。詳細は後述の[「Supabase の自動一時停止を防ぐ」](#supabase-の自動一時停止を防ぐキープアライブ)を参照。
 - **エラーモニタリング（Sentry・任意）** — `@sentry/nextjs` を導入済み。`NEXT_PUBLIC_SENTRY_DSN` を設定すると本番のクライアント／サーバーエラーを Sentry に送信します（未設定時は完全に無効で、ビルド・実行に一切影響しません）。ソースマップを Sentry にアップロードする場合のみ `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` を設定してください。
 
 ## デプロイ
@@ -178,7 +178,8 @@ Supabase のフリープランは **7日間アクティビティがない**と�
 }
 ```
 
-- **セットアップ不要・完全自動** — `vercel.json` が本番にデプロイされた時点で Vercel が cron を自動登録し、以降は毎日自動実行されます。手動トリガーや外部サービス・追加の環境変数は不要です。登録状況は Vercel ダッシュボードの **Settings → Cron Jobs** で確認できます。
+- **ほぼセットアップ不要・完全自動** — `vercel.json` が本番にデプロイされた時点で Vercel が cron を自動登録し、以降は毎日自動実行されます。手動トリガーや外部サービスは不要です。登録状況は Vercel ダッシュボードの **Settings → Cron Jobs** で確認できます。
+- **無認証アクセスの防止（`CRON_SECRET`）** — `GET /api/health` は公開エンドポイントのため、環境変数 `CRON_SECRET` を設定すると、Vercel Cron が自動付与する `Authorization: Bearer <CRON_SECRET>` ヘッダを検証し、一致しないリクエストには **401** を返します。値は `openssl rand -hex 32` などで生成し、Vercel の **Settings → Environment Variables** に Production として登録します（Vercel Cron 側は自動でヘッダを付けるため追加設定不要）。未設定の環境（ローカル/プレビュー）では検証をスキップします。
 - **頻度の根拠** — Supabase の停止は7日間なので、日次なら1回取りこぼしても約6日の余裕が残ります。Vercel Hobby は cron の最小間隔が「1日1回」・精度は時間単位（`0 3 * * *` は 03:00〜03:59 UTC の間に発火）で、keepalive 用途には十分です。
 - **なぜ GitHub Actions を使わないか** — GitHub のスケジュール実行はデフォルトブランチが60日更新されないと自動無効化され、それを回避する「活動維持コミット」は GitHub の利用規約（人工的な活動生成）に抵触するおそれがあります。Vercel Cron はアプリと同じ基盤に内包され、この問題を根本的に回避します。
 
