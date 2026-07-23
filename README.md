@@ -56,7 +56,7 @@
 - **アカウント管理** — ログアウト・設定への入口を右上メニューに集約（ヒューリスティック評価に基づく導線設計）。本人によるアカウント削除は `SECURITY DEFINER` 関数 `delete_own_account()` 経由で自分の行のみを削除し、`ON DELETE CASCADE` で言葉・プロフィールを連動削除
 - **プロフィール画像** — クライアント側でズーム・位置調整して円形に切り抜き、512px に縮小して Supabase Storage（`avatars` バケット）へアップロード。ストレージの RLS で「閲覧は公開／書き込みは本人フォルダ（`{uid}/...`）のみ」を保証し、`profiles.avatar_url` に公開 URL を保存（キャッシュ無効化のため `?v=` を付与）
 - **書体の役割分担（和×モダン）** — 「作品」と「情報」を書体で分離。**引用文・出典/作者・メモ・ブランドワードマーク「中心銘」は明朝（Noto Serif JP）**、**フォーム・ボタン・ラベル・見出し・日付などのUIはサンセリフ（Noto Sans JP）**を既定とする。`app/layout.tsx` で両フォントを CSS 変数（`--font-noto-serif` / `--font-noto-sans`）として読み込み、`app/globals.css` の `@theme` で `--font-serif` / `--font-sans` にマッピング。本文既定はサンセリフで、明朝は `font-serif` クラスで明示的に適用（方針は [`BRAND.md`](BRAND.md) §9）
-- **ブランドの一貫性** — ファビコン（`app/icon.png` / `apple-icon.png`）と共有用 OGP カード画像（`public/og.png`）を、和紙色・明朝体・editorial navy（accent）アクセントで統一。加えて朱の差し色トークン `--accent-vermilion`（危険色 `--danger` とは別用途）を定義し、UI ではワードマーク脇の小さな点として**一点主義**で使用（方針は [`BRAND.md`](BRAND.md) §9）
+- **ブランドの一貫性** — ファビコン（`app/icon.png` / `apple-icon.png`）と共有用 OGP カード画像（`public/og.png`）を、和紙色・明朝体・editorial navy（accent）アクセントで統一
 - **お試しモードの分離設計** — 動作実績のある認証済み CRUD（`WordsClient` / 既存 Server Actions / `proxy.ts` の認証ガード）には手を入れず、お試し機能を独立系統として追加。`proxy.ts` の公開パス判定に `/try` を1条件足すだけで未認証アクセスを許可し、UI は `localStorage` 駆動の `TryWordsClient`、引き継ぎは `bulkAddWords` Server Action で実装。検証（`validateWord`）・トースト・確認ダイアログは既存の純粋な部品を再利用。引き継ぎは登録直後ではなくホーム到達後（session 確立後）に行い、メール確認 ON 環境でも確実に処理
 - **メール確認リンクの方式統一** — 新規登録の確認リンクは PKCE の code 方式だと code_verifier がメールリンク経由で失われ、別ブラウザ／スマホで開くとログインできない。パスワードリセットと同じく **token_hash 方式**に統一し、`app/auth/callback/route.ts` で `code`（OAuth）と `token_hash`（メール確認）の両方を `verifyOtp` 等で処理
 
