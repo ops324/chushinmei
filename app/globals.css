@@ -43,6 +43,10 @@
 }
 
 @theme inline {
+  /* 書体の役割分担（BRAND.md §9）: sans=UI/情報 の既定・serif=引用/ブランド */
+  --font-sans:  var(--font-noto-sans), 'Noto Sans JP', system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif), 'Noto Serif JP', serif;
+
   --color-bg:            var(--bg);
   --color-bg-card:       var(--bg-card);
   --color-bg-surface:    var(--bg-surface);
@@ -70,7 +74,7 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Noto Serif JP', serif;
+  font-family: var(--font-sans);
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

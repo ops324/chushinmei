@@ -1,12 +1,21 @@
 import type { Metadata } from 'next'
-import { Noto_Serif_JP } from 'next/font/google'
+import { Noto_Serif_JP, Noto_Sans_JP } from 'next/font/google'
 import { ToastProvider } from '@/components/ui/Toast'
 import './globals.css'
 
+// 明朝＝引用・ブランド（作品）／サンセリフ＝UI（情報）の役割分担（BRAND.md §9）
 const notoSerifJP = Noto_Serif_JP({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   display: 'swap',
+  variable: '--font-noto-serif',
+})
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans',
 })
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://chushinmei.vercel.app'
@@ -37,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ja" className={`${notoSerifJP.className} h-full`}>
+    <html lang="ja" className={`${notoSerifJP.variable} ${notoSansJP.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <ToastProvider>{children}</ToastProvider>
       </body>

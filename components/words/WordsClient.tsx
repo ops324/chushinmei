@@ -239,13 +239,13 @@ function TodayWord({ words }: { words: Word[] }) {
             くじを引く
           </button>
         </div>
-        <p className="text-xl font-medium leading-[2.1] text-ink mb-4 whitespace-pre-wrap">
+        <p className="font-serif text-xl font-medium leading-[2.1] text-ink mb-4 whitespace-pre-wrap">
           {entry.text}
         </p>
         <div className="flex items-end justify-between gap-4 text-sm">
           <div>
             {entry.author && (
-              <p className="text-ink-light whitespace-pre-wrap">— {entry.author}</p>
+              <p className="font-serif text-ink-light whitespace-pre-wrap">— {entry.author}</p>
             )}
           </div>
           <p className="text-xs text-ink-faint shrink-0">
@@ -349,16 +349,16 @@ function WordCard({
           showToast={showToast}
         />
       </div>
-      <p className="text-[15px] font-medium leading-[2.1] whitespace-pre-wrap text-ink mb-3 pr-9">
+      <p className="font-serif text-[15px] font-medium leading-[2.1] whitespace-pre-wrap text-ink mb-3 pr-9">
         {word.text}
       </p>
       <div className="pt-3 border-t border-border flex items-start justify-between gap-4 text-xs">
         <div className="flex flex-col gap-0.5">
           {word.author && (
-            <span className="text-ink-light whitespace-pre-wrap">— {word.author}</span>
+            <span className="font-serif text-ink-light whitespace-pre-wrap">— {word.author}</span>
           )}
           {word.memo && (
-            <span className="text-ink-faint italic whitespace-pre-wrap">{word.memo}</span>
+            <span className="text-ink-faint whitespace-pre-wrap">{word.memo}</span>
           )}
         </div>
         <span className="text-ink-faint shrink-0 mt-0.5">{date}</span>
