@@ -15,11 +15,8 @@ export async function proxy(request: NextRequest) {
   // パブリックパス（認証不要かつセッション不要）— Supabaseへの接続を省略
   // /auth/callback と /auth/update-password はセッション処理が必要なので除外
   // /api/health はキープアライブ兼ヘルスチェック（未認証で到達可能である必要がある）
-  // /opengraph-image・/apple-icon は動的生成のメタ画像。SNSクローラー等が未認証で
-  // 取得できる必要があるため公開扱いにする（/icon.svg は matcher の拡張子除外で対象外）。
   const authNeedsSession = pathname === '/auth/callback' || pathname === '/auth/update-password'
-  const isPublicMetaImage = pathname === '/opengraph-image' || pathname === '/apple-icon'
-  if ((pathname.startsWith('/auth') && !authNeedsSession) || pathname.startsWith('/shared') || pathname.startsWith('/try') || pathname.startsWith('/api/health') || isPublicMetaImage) {
+  if ((pathname.startsWith('/auth') && !authNeedsSession) || pathname.startsWith('/shared') || pathname.startsWith('/try') || pathname.startsWith('/api/health')) {
     return supabaseResponse
   }
 
