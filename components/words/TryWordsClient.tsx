@@ -349,7 +349,7 @@ function TryWordCard({
             <span className="font-serif text-ink-light whitespace-pre-wrap">— {word.author}</span>
           )}
           {word.memo && (
-            <span className="text-ink-faint whitespace-pre-wrap">{word.memo}</span>
+            <span className="font-serif text-ink-faint italic whitespace-pre-wrap">{word.memo}</span>
           )}
         </div>
         <span className="text-ink-faint shrink-0 mt-0.5">{date}</span>
