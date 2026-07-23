@@ -5,7 +5,7 @@ import { resetPassword } from '@/lib/actions/auth-actions'
 import Link from 'next/link'
 
 const inputClass =
-  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted transition-colors placeholder:text-ink-faint'
 
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 
@@ -24,7 +24,7 @@ export default function ForgotPasswordForm() {
           </p>
           <Link
             href="/auth/login"
-            className="text-center text-sm text-ai hover:underline underline-offset-4"
+            className="text-center text-sm text-accent hover:underline underline-offset-4"
           >
             ログインに戻る
           </Link>
@@ -56,12 +56,12 @@ export default function ForgotPasswordForm() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
+            className="w-full bg-accent text-white rounded py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-40 mt-1"
           >
             {pending ? '送信中...' : 'リセットメールを送信'}
           </button>
           <div className="pt-1 text-center">
-            <Link href="/auth/login" className="text-sm text-ai hover:underline underline-offset-4">
+            <Link href="/auth/login" className="text-sm text-accent hover:underline underline-offset-4">
               ログインに戻る
             </Link>
           </div>

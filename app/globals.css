@@ -11,10 +11,15 @@
   --ink-light:   #6a6058;   /* warm gray   */
   --ink-faint:   #736756;   /* faded warm — WCAG AA(4.5:1) on bg / bg-card */
 
-  /* ─ Accent — deep editorial navy ───────────── */
-  --ai:          #1e3654;
-  --ai-light:    #2a4e7c;
-  --ai-muted:    #e4ecf6;   /* very light tint for focus rings */
+  /* ─ Accent — editorial navy ─────────────────── */
+  --accent:        #1e3654;
+  --accent-light:  #2a4e7c;
+  --accent-muted:  #e4ecf6;   /* very light tint for focus rings */
+
+  /* deprecated aliases — 後続PRで削除予定（旧 --ai 系） */
+  --ai:            var(--accent);
+  --ai-light:      var(--accent-light);
+  --ai-muted:      var(--accent-muted);
 
   /* ─ Borders ─────────────────────────────────── */
   --border:        #d5cec0;
@@ -44,6 +49,10 @@
   --color-ink:           var(--ink);
   --color-ink-light:     var(--ink-light);
   --color-ink-faint:     var(--ink-faint);
+  --color-accent:        var(--accent);
+  --color-accent-light:  var(--accent-light);
+  --color-accent-muted:  var(--accent-muted);
+  /* deprecated aliases — 後続PRで削除予定 */
   --color-ai:            var(--ai);
   --color-ai-light:      var(--ai-light);
   --color-ai-muted:      var(--ai-muted);
@@ -72,8 +81,8 @@ input, textarea, button, select {
 }
 
 ::selection {
-  background: var(--ai-muted);
-  color: var(--ai);
+  background: var(--accent-muted);
+  color: var(--accent);
 }
 
 ::-webkit-scrollbar        { width: 5px; height: 5px; }

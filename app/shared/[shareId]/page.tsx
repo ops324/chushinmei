@@ -62,7 +62,7 @@ export default async function SharedWordPage({ params }: Props) {
     <div className="min-h-screen bg-bg flex flex-col">
       <header
         className="bg-bg-card border-b border-border"
-        style={{ borderTop: '3px solid var(--ai)' }}
+        style={{ borderTop: '3px solid var(--accent)' }}
       >
         <div className="max-w-2xl mx-auto w-full px-4 h-[52px] flex items-center justify-between">
           <Link
@@ -76,7 +76,7 @@ export default async function SharedWordPage({ params }: Props) {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="relative text-center max-w-lg w-full p-10 bg-bg-card border border-border rounded overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[3px] bg-ai" />
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-accent" />
           <div
             className="absolute inset-[7px] border border-border rounded pointer-events-none opacity-50"
             aria-hidden

@@ -11,7 +11,7 @@ export default function Header({ displayName, email, avatarUrl }: Props) {
   return (
     <header
       className="bg-bg-card border-b border-border sticky top-0 z-40"
-      style={{ borderTop: '3px solid var(--ai)' }}
+      style={{ borderTop: '3px solid var(--accent)' }}
     >
       <div className="max-w-2xl mx-auto w-full px-4 h-[52px] grid grid-cols-3 items-center">
         <div aria-hidden />

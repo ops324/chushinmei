@@ -86,7 +86,7 @@ export default function TryMigrationPrompt() {
           <button
             onClick={handleImport}
             disabled={isImporting}
-            className="px-5 py-2 text-sm font-medium text-white rounded bg-ai hover:bg-ai-light transition-colors disabled:opacity-40"
+            className="px-5 py-2 text-sm font-medium text-white rounded bg-accent hover:bg-accent-light transition-colors disabled:opacity-40"
           >
             {isImporting ? '取り込み中...' : '取り込む'}
           </button>

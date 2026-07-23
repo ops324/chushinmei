@@ -14,10 +14,10 @@ import Avatar from '@/components/ui/Avatar'
 import AvatarCropDialog from '@/components/account/AvatarCropDialog'
 
 const inputClass =
-  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted transition-colors placeholder:text-ink-faint'
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 const submitClass =
-  'bg-ai text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40'
+  'bg-accent text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-40'
 
 type FormState = { error?: string; success?: string } | null
 

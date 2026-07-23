@@ -5,7 +5,7 @@ import { register } from '@/lib/actions/auth-actions'
 import Link from 'next/link'
 
 const inputClass =
-  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted transition-colors placeholder:text-ink-faint'
 
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 
@@ -23,7 +23,7 @@ export default function RegisterForm() {
         <div className="flex justify-center mb-4">
           <span
             className="inline-flex items-center justify-center w-12 h-12 rounded-full"
-            style={{ background: 'var(--ai-muted)', color: 'var(--ai)' }}
+            style={{ background: 'var(--accent-muted)', color: 'var(--accent)' }}
             aria-hidden
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -45,7 +45,7 @@ export default function RegisterForm() {
         <div className="mt-6 pt-5 border-t border-border">
           <p className="text-sm text-ink-faint">
             確認が済んだら{' '}
-            <Link href="/auth/login" className="text-ai font-medium hover:underline underline-offset-4">
+            <Link href="/auth/login" className="text-accent font-medium hover:underline underline-offset-4">
               ログイン
             </Link>
           </p>
@@ -101,7 +101,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
+          className="w-full bg-accent text-white rounded py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-40 mt-1"
         >
           {pending ? '登録中...' : 'アカウント作成'}
         </button>
@@ -110,12 +110,12 @@ export default function RegisterForm() {
       <div className="mt-5 pt-5 border-t border-border text-center flex flex-col gap-2">
         <p className="text-sm text-ink-faint">
           すでにアカウントをお持ちの方は{' '}
-          <Link href="/auth/login" className="text-ai font-medium hover:underline underline-offset-4">
+          <Link href="/auth/login" className="text-accent font-medium hover:underline underline-offset-4">
             ログイン
           </Link>
         </p>
         <p className="text-sm text-ink-faint">
-          <Link href="/try" className="text-ai font-medium hover:underline underline-offset-4">
+          <Link href="/try" className="text-accent font-medium hover:underline underline-offset-4">
             まずはお試しで体験する
           </Link>
         </p>
