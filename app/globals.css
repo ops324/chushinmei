@@ -16,6 +16,9 @@
   --accent-light:  #2a4e7c;
   --accent-muted:  #e4ecf6;   /* very light tint for focus rings */
 
+  /* ─ 朱 — brand vermilion（差し色・一点主義 / 危険色 --danger とは別用途）─ */
+  --accent-vermilion: #c8442a;
+
   /* deprecated aliases — 後続PRで削除予定（旧 --ai 系） */
   --ai:            var(--accent);
   --ai-light:      var(--accent-light);
@@ -56,6 +59,7 @@
   --color-accent:        var(--accent);
   --color-accent-light:  var(--accent-light);
   --color-accent-muted:  var(--accent-muted);
+  --color-accent-vermilion: var(--accent-vermilion);
   /* deprecated aliases — 後続PRで削除予定 */
   --color-ai:            var(--ai);
   --color-ai-light:      var(--ai-light);
