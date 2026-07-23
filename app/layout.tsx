@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     siteName: '中心銘',
     type: 'website',
     locale: 'ja_JP',
-    images: ['/og.png'],
+    // og:image は app/opengraph-image.tsx が自動生成（ファイル規約）
   },
   twitter: {
     card: 'summary_large_image',
     title: '中心銘',
     description: '大切な言葉を、手元に。',
-    images: ['/og.png'],
+    // twitter:image も app/opengraph-image.tsx から自動付与
   },
 }
 

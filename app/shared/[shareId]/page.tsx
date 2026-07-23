@@ -38,13 +38,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: '中心銘',
       type: 'article',
       locale: 'ja_JP',
-      images: ['/og.png'],
+      // og:image は app/opengraph-image.tsx が自動生成（ブランドカードを共通利用）
     },
     twitter: {
       card: 'summary_large_image',
       title: headline,
       description,
-      images: ['/og.png'],
     },
   }
 }

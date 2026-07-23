@@ -19,7 +19,7 @@
 - **検索** — 言葉・出典・メモを横断してリアルタイム絞り込み
 - **共有リンク** — 個別の言葉を OGP 付きの固有 URL（`/shared/[shareId]`）で公開
 - **SNS シェア** — X・LINE・Facebook への投稿、OS 標準の共有シート（モバイル）、URL コピー（非セキュア環境向けフォールバック付き）に対応。自分の一覧と公開ページの双方から共有可能。引用文の二重表示を避けるため共有メッセージ本文は URL のみとし、言葉・出典は OGP カードに集約
-- **OGP カード画像** — シェア時に SNS のプレビューへ和紙基調のブランドカード画像（`og:image` / Twitter `summary_large_image`）を表示し、`og:title` / `og:description` に言葉・出典を掲載
+- **OGP カード画像（動的生成）** — シェア時に SNS のプレビューへ和紙基調のブランドカード画像（`og:image` / Twitter `summary_large_image`）を表示し、`og:title` / `og:description` に言葉・出典を掲載。カード画像は `app/opengraph-image.tsx` が Next.js の `ImageResponse` で動的生成（ブランドシンボル＋ワードマーク＋タグライン。明朝はGoogle Fontsから使用文字だけをサブセット取得）。未認証のSNSクローラーが取得できるよう `/opengraph-image`・`/apple-icon` を `proxy.ts` の公開パスに追加
 - **アカウント設定** — 右上のアカウントメニューから設定ページ（`/account`）へ遷移し、表示名・メールアドレス・パスワードの変更、アカウント削除を操作可能。ログアウトはメニューに集約
 - **プロフィール画像** — アカウント設定からアイコン画像をアップロード・差し替え・削除（Supabase Storage の `avatars` バケットに保存）。アップロード時にズーム・位置を調整して円形に切り抜き可能（`react-easy-crop`）。未設定時は表示名の頭文字を表示
 - **楽観的 UI / 読み込みスケルトン** — 削除を即座に反映し体感速度を向上。サーバー応答待ちの間は `app/loading.tsx` のスケルトンを即時表示し、画面が真っ白になる時間をゼロに
@@ -56,7 +56,7 @@
 - **アカウント管理** — ログアウト・設定への入口を右上メニューに集約（ヒューリスティック評価に基づく導線設計）。本人によるアカウント削除は `SECURITY DEFINER` 関数 `delete_own_account()` 経由で自分の行のみを削除し、`ON DELETE CASCADE` で言葉・プロフィールを連動削除
 - **プロフィール画像** — クライアント側でズーム・位置調整して円形に切り抜き、512px に縮小して Supabase Storage（`avatars` バケット）へアップロード。ストレージの RLS で「閲覧は公開／書き込みは本人フォルダ（`{uid}/...`）のみ」を保証し、`profiles.avatar_url` に公開 URL を保存（キャッシュ無効化のため `?v=` を付与）
 - **書体の役割分担（和×モダン）** — 「作品」と「情報」を書体で分離。**引用文・出典/作者・メモ・ブランドワードマーク「中心銘」は明朝（Noto Serif JP）**、**フォーム・ボタン・ラベル・見出し・日付などのUIはサンセリフ（Noto Sans JP）**を既定とする。`app/layout.tsx` で両フォントを CSS 変数（`--font-noto-serif` / `--font-noto-sans`）として読み込み、`app/globals.css` の `@theme` で `--font-serif` / `--font-sans` にマッピング。本文既定はサンセリフで、明朝は `font-serif` クラスで明示的に適用（方針は [`BRAND.md`](BRAND.md) §9）
-- **ブランドの一貫性** — ファビコン（`app/icon.png` / `apple-icon.png`）と共有用 OGP カード画像を、和紙色・明朝体・editorial navy（accent）アクセントで統一
+- **ブランドの一貫性（シンボル＋朱の一点）** — ファビコン（`app/icon.svg`）・Apple アイコン（`app/apple-icon.tsx`）・OGP カード（`app/opengraph-image.tsx`）を、和紙色・明朝体・editorial navy（accent）で統一。ブランドシンボルは**文字を使わない抽象マーク**＝墨の角枠の中心に**朱の一点**（中心＝core／朱＝銘）。朱は差し色トークン `--accent-vermilion`（危険色 `--danger` とは別用途）として定義し、UI ではワードマーク脇の小さな点として**一点主義**で使用（方針は [`BRAND.md`](BRAND.md) §9）
 - **お試しモードの分離設計** — 動作実績のある認証済み CRUD（`WordsClient` / 既存 Server Actions / `proxy.ts` の認証ガード）には手を入れず、お試し機能を独立系統として追加。`proxy.ts` の公開パス判定に `/try` を1条件足すだけで未認証アクセスを許可し、UI は `localStorage` 駆動の `TryWordsClient`、引き継ぎは `bulkAddWords` Server Action で実装。検証（`validateWord`）・トースト・確認ダイアログは既存の純粋な部品を再利用。引き継ぎは登録直後ではなくホーム到達後（session 確立後）に行い、メール確認 ON 環境でも確実に処理
 - **メール確認リンクの方式統一** — 新規登録の確認リンクは PKCE の code 方式だと code_verifier がメールリンク経由で失われ、別ブラウザ／スマホで開くとログインできない。パスワードリセットと同じく **token_hash 方式**に統一し、`app/auth/callback/route.ts` で `code`（OAuth）と `token_hash`（メール確認）の両方を `verifyOtp` 等で処理
 
