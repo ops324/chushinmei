@@ -67,7 +67,7 @@ export default async function SharedWordPage({ params }: Props) {
         <div className="max-w-2xl mx-auto w-full px-4 h-[52px] flex items-center justify-between">
           <Link
             href="/"
-            className="text-xs tracking-[0.2em] text-ink-faint hover:text-ink transition-colors font-medium"
+            className="font-serif text-xs tracking-[0.2em] text-ink-faint hover:text-ink transition-colors font-medium"
           >
             中心銘
           </Link>
@@ -81,12 +81,12 @@ export default async function SharedWordPage({ params }: Props) {
             className="absolute inset-[7px] border border-border rounded pointer-events-none opacity-50"
             aria-hidden
           />
-          <p className="text-[10px] tracking-[0.4em] text-ink-faint mb-7 uppercase">中心銘</p>
-          <p className="text-xl font-medium leading-[2.1] text-ink mb-5 whitespace-pre-wrap">
+          <p className="font-serif text-[10px] tracking-[0.4em] text-ink-faint mb-7 uppercase">中心銘</p>
+          <p className="font-serif text-xl font-medium leading-[2.1] text-ink mb-5 whitespace-pre-wrap">
             {word.text}
           </p>
           {word.author && (
-            <p className="text-sm text-ink-light tracking-wide whitespace-pre-wrap">— {word.author}</p>
+            <p className="font-serif text-sm text-ink-light tracking-wide whitespace-pre-wrap">— {word.author}</p>
           )}
           <p className="text-xs text-ink-faint mt-7">{date}</p>
         </div>

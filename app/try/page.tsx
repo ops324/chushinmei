@@ -14,7 +14,7 @@ export default function TryPage() {
           <span className="text-[10px] tracking-[0.25em] text-ink-faint">お試し中</span>
           <Link
             href="/"
-            className="justify-self-center text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors"
+            className="font-serif justify-self-center text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors"
           >
             中心銘
           </Link>

@@ -7,7 +7,7 @@ export default function Loading() {
       >
         <div className="max-w-2xl mx-auto w-full px-4 h-[52px] grid grid-cols-3 items-center">
           <div aria-hidden />
-          <span className="justify-self-center text-sm font-semibold text-ink tracking-[0.22em]">
+          <span className="font-serif justify-self-center text-sm font-semibold text-ink tracking-[0.22em]">
             中心銘
           </span>
           <div className="justify-self-end">

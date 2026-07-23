@@ -15,7 +15,7 @@ export default function Header({ displayName, email, avatarUrl }: Props) {
     >
       <div className="max-w-2xl mx-auto w-full px-4 h-[52px] grid grid-cols-3 items-center">
         <div aria-hidden />
-        <Link href="/" className="justify-self-center text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors">
+        <Link href="/" className="font-serif justify-self-center text-sm font-semibold text-ink tracking-[0.22em] hover:text-ink-light transition-colors">
           中心銘
         </Link>
         <div className="justify-self-end">
