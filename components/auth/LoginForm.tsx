@@ -10,7 +10,7 @@ const HASH_ERROR_MAP: Record<string, string> = {
 }
 
 const inputClass =
-  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors placeholder:text-ink-faint'
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted transition-colors placeholder:text-ink-faint'
 
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 
@@ -69,7 +69,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
+          className="w-full bg-accent text-white rounded py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-40 mt-1"
         >
           {pending ? 'ログイン中...' : 'ログイン'}
         </button>
@@ -77,18 +77,18 @@ export default function LoginForm() {
 
       <div className="mt-5 pt-5 border-t border-border flex flex-col gap-2 text-center">
         <p className="text-sm text-ink-faint">
-          <Link href="/auth/forgot-password" className="text-ai font-medium hover:underline underline-offset-4">
+          <Link href="/auth/forgot-password" className="text-accent font-medium hover:underline underline-offset-4">
             パスワードを忘れた方
           </Link>
         </p>
         <p className="text-sm text-ink-faint">
           アカウントがない方は{' '}
-          <Link href="/auth/register" className="text-ai font-medium hover:underline underline-offset-4">
+          <Link href="/auth/register" className="text-accent font-medium hover:underline underline-offset-4">
             登録
           </Link>
         </p>
         <p className="text-sm text-ink-faint pt-1">
-          <Link href="/try" className="text-ai font-medium hover:underline underline-offset-4">
+          <Link href="/try" className="text-accent font-medium hover:underline underline-offset-4">
             まずはお試しで体験する
           </Link>
         </p>

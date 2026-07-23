@@ -17,12 +17,12 @@ type Word = {
 }
 
 const inputClass =
-  'text-sm px-3 py-2.5 bg-bg border border-border rounded text-ink outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted resize-y placeholder:text-ink-faint transition-colors'
+  'text-sm px-3 py-2.5 bg-bg border border-border rounded text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted resize-y placeholder:text-ink-faint transition-colors'
 
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 
 const btnPrimary =
-  'px-7 py-2 text-sm font-medium bg-ai text-white rounded hover:bg-ai-light transition-colors disabled:opacity-40'
+  'px-7 py-2 text-sm font-medium bg-accent text-white rounded hover:bg-accent-light transition-colors disabled:opacity-40'
 
 const btnSecondary =
   'px-5 py-2 text-sm text-ink-light border border-border rounded hover:border-border-strong hover:text-ink transition-colors'
@@ -86,7 +86,7 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
           className={`w-full py-3 px-4 text-sm tracking-widest border border-dashed rounded transition-all text-center ${
             formOpen
               ? 'text-ink-light border-border-strong bg-bg-card'
-              : 'text-ink-light border-border hover:bg-bg-card hover:border-ai hover:text-ai'
+              : 'text-ink-light border-border hover:bg-bg-card hover:border-accent hover:text-accent'
           }`}
         >
           {formOpen ? '✕ 閉じる' : '＋ 言葉を記す'}
@@ -153,7 +153,7 @@ export default function WordsClient({ initialWords }: { initialWords: Word[] }) 
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="言葉・出典で検索..."
-            className="w-full text-sm pl-9 pr-14 py-2.5 bg-bg-card border border-border rounded text-ink outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted placeholder:text-ink-faint transition-colors"
+            className="w-full text-sm pl-9 pr-14 py-2.5 bg-bg-card border border-border rounded text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted placeholder:text-ink-faint transition-colors"
           />
           <span className="absolute right-3.5 text-xs text-ink-faint pointer-events-none">
             {query ? `${filtered.length}件` : `${optimisticWords.length}件`}
@@ -228,13 +228,13 @@ function TodayWord({ words }: { words: Word[] }) {
 
   return (
     <section className="relative mb-10 bg-bg-card border border-border rounded overflow-hidden">
-      <div className="h-[3px] bg-ai" />
+      <div className="h-[3px] bg-accent" />
       <div className="p-7">
         <div className="flex items-center justify-between mb-5">
           <p className="text-[10px] tracking-[0.35em] text-ink-faint uppercase">今日の言葉</p>
           <button
             onClick={handleRandom}
-            className="text-xs text-ink-faint border border-border rounded px-3 py-1 hover:border-ai hover:text-ai transition-all tracking-wide"
+            className="text-xs text-ink-faint border border-border rounded px-3 py-1 hover:border-accent hover:text-accent transition-all tracking-wide"
           >
             くじを引く
           </button>
@@ -289,7 +289,7 @@ function WordCard({
 
   if (editing) {
     return (
-      <div className="relative bg-bg-card border border-ai rounded px-6 py-5">
+      <div className="relative bg-bg-card border border-accent rounded px-6 py-5">
         <form action={handleUpdate} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>

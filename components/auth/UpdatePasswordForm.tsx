@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const inputClass =
-  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-ai focus:ring-2 focus:ring-ai-muted transition-colors disabled:opacity-50 placeholder:text-ink-faint'
+  'w-full border border-border rounded px-3.5 py-2.5 text-sm text-ink bg-bg outline-none focus:border-accent focus:ring-2 focus:ring-accent-muted transition-colors disabled:opacity-50 placeholder:text-ink-faint'
 
 const labelClass = 'text-xs font-medium text-ink-light tracking-wide'
 
@@ -129,7 +129,7 @@ export default function UpdatePasswordForm() {
         <button
           type="submit"
           disabled={pending || !sessionReady}
-          className="w-full bg-ai text-white rounded py-2.5 text-sm font-medium hover:bg-ai-light transition-colors disabled:opacity-40 mt-1"
+          className="w-full bg-accent text-white rounded py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-40 mt-1"
         >
           {pending ? '更新中...' : 'パスワードを更新'}
         </button>

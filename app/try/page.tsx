@@ -8,7 +8,7 @@ export default function TryPage() {
     <>
       <header
         className="bg-bg-card border-b border-border sticky top-0 z-40"
-        style={{ borderTop: '3px solid var(--ai)' }}
+        style={{ borderTop: '3px solid var(--accent)' }}
       >
         <div className="max-w-2xl mx-auto w-full px-4 h-[52px] grid grid-cols-3 items-center">
           <span className="text-[10px] tracking-[0.25em] text-ink-faint">お試し中</span>
@@ -20,7 +20,7 @@ export default function TryPage() {
           </Link>
           <Link
             href="/auth/register?from=try"
-            className="justify-self-end text-xs font-medium bg-ai text-white rounded px-3.5 py-1.5 hover:bg-ai-light transition-colors"
+            className="justify-self-end text-xs font-medium bg-accent text-white rounded px-3.5 py-1.5 hover:bg-accent-light transition-colors"
           >
             登録して保存
           </Link>
@@ -29,7 +29,7 @@ export default function TryPage() {
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         <div className="mb-8 bg-bg-card border border-border rounded px-5 py-4 flex items-start gap-3">
-          <span className="text-ai mt-0.5 shrink-0" aria-hidden>
+          <span className="text-accent mt-0.5 shrink-0" aria-hidden>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
             </svg>
@@ -46,13 +46,13 @@ export default function TryPage() {
           <p className="text-sm text-ink-faint mb-4">気に入ったら、言葉を手元に残しましょう。</p>
           <Link
             href="/auth/register?from=try"
-            className="inline-block bg-ai text-white rounded px-7 py-2.5 text-sm font-medium hover:bg-ai-light transition-colors"
+            className="inline-block bg-accent text-white rounded px-7 py-2.5 text-sm font-medium hover:bg-accent-light transition-colors"
           >
             登録して保存する
           </Link>
           <p className="text-sm text-ink-faint mt-4">
             すでにアカウントをお持ちの方は{' '}
-            <Link href="/auth/login" className="text-ai font-medium hover:underline underline-offset-4">
+            <Link href="/auth/login" className="text-accent font-medium hover:underline underline-offset-4">
               ログイン
             </Link>
           </p>

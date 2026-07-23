@@ -23,7 +23,7 @@ export default function Avatar({ src, name, size }: Props) {
   const initial = (name || '?').trim().charAt(0).toUpperCase()
   return (
     <span
-      className="flex items-center justify-center rounded-full bg-ai text-white font-medium shrink-0"
+      className="flex items-center justify-center rounded-full bg-accent text-white font-medium shrink-0"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
     >
       {initial}

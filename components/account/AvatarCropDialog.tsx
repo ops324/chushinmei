@@ -100,7 +100,7 @@ export default function AvatarCropDialog({ src, onConfirm, onCancel }: Props) {
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
             className="flex-1"
-            style={{ accentColor: 'var(--ai)' }}
+            style={{ accentColor: 'var(--accent)' }}
             aria-label="ズーム"
           />
           <span className="text-xs text-ink-faint shrink-0">拡大</span>
@@ -120,7 +120,7 @@ export default function AvatarCropDialog({ src, onConfirm, onCancel }: Props) {
             type="button"
             onClick={handleApply}
             disabled={busy}
-            className="px-5 py-2 text-sm font-medium text-white rounded bg-ai hover:bg-ai-light transition-colors disabled:opacity-40"
+            className="px-5 py-2 text-sm font-medium text-white rounded bg-accent hover:bg-accent-light transition-colors disabled:opacity-40"
           >
             {busy ? '処理中...' : '適用'}
           </button>
