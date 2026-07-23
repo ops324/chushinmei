@@ -19,11 +19,6 @@
   /* ─ 朱 — brand vermilion（差し色・一点主義 / 危険色 --danger とは別用途）─ */
   --accent-vermilion: #c8442a;
 
-  /* deprecated aliases — 後続PRで削除予定（旧 --ai 系） */
-  --ai:            var(--accent);
-  --ai-light:      var(--accent-light);
-  --ai-muted:      var(--accent-muted);
-
   /* ─ Borders ─────────────────────────────────── */
   --border:        #d5cec0;
   --border-strong: #bcb3a4;
@@ -60,10 +55,6 @@
   --color-accent-light:  var(--accent-light);
   --color-accent-muted:  var(--accent-muted);
   --color-accent-vermilion: var(--accent-vermilion);
-  /* deprecated aliases — 後続PRで削除予定 */
-  --color-ai:            var(--ai);
-  --color-ai-light:      var(--ai-light);
-  --color-ai-muted:      var(--ai-muted);
   --color-border:        var(--border);
   --color-border-strong: var(--border-strong);
   --color-danger:        var(--danger);
